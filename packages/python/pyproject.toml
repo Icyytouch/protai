@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "protai"
+version = "0.1.0"
+description = "Official Python SDK for ProtAI — drop-in credit metering and spend guardrails for AI apps."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "ProtAI" }]
+keywords = ["protai", "metering", "credits", "usage", "ai", "billing", "guardrails"]
+dependencies = ["requests>=2.31"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://protai.co.uk"
+Documentation = "https://protai.co.uk/docs"
+Repository = "https://github.com/protai/protai.git"
+
+[tool.setuptools.packages.find]
+where = ["src"]
