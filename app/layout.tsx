@@ -16,8 +16,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ProtAI — Stop free-tier users burning your AI budget",
   description:
-    "Drop-in credit metering for AI apps. Per-user balances, spend alerts, and a kill-switch — live in three lines of code. Works with any AI provider.",
+    "ProtAI is drop-in credit metering for AI apps — per-user quotas, spend alerts, kill-switch & Stripe top-ups. Stop free-tier users burning your AI budget.",
   metadataBase: new URL("https://protai.co.uk"),
+  openGraph: {
+    title: "ProtAI — Stop free-tier users burning your AI budget",
+    description:
+      "Drop-in credit metering for AI apps — per-user quotas, spend alerts, kill-switch & Stripe top-ups.",
+    url: "https://protai.co.uk",
+    siteName: "ProtAI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "ProtAI — Stop free-tier users burning your AI budget",
+    description:
+      "Drop-in credit metering for AI apps — per-user quotas, spend alerts, kill-switch & Stripe top-ups.",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
