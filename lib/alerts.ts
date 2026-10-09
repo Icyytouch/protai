@@ -1,3 +1,5 @@
+import { after } from 'next/server';
+
 import { createAdminSupabaseClient } from './supabase-admin';
 import { currentPeriod, toNum, type Meter } from './metering';
 import { sendEmail } from './email';
@@ -53,9 +55,14 @@ export async function evaluateAlerts(
     }
 
     if (fired) {
-      // Fire-and-forget: never block metering on email delivery.
-      void sendAlertEmail(db, projectId, meter, endUserId, usagePct, firedThreshold, period).catch((err) =>
-        console.error('[alerts] email failed:', err),
+      // `after`, not a bare floating promise: in serverless the runtime may
+      // freeze background work once the response is sent, so an un-awaited
+      // send would silently never run. `after` guarantees it completes
+      // without delaying the metering response.
+      after(() =>
+        sendAlertEmail(db, projectId, meter, endUserId, usagePct, firedThreshold, period).catch((err) =>
+          console.error('[alerts] email failed:', err),
+        ),
       );
     }
   } catch {
