@@ -2,9 +2,11 @@ import Link from "next/link";
 import { CodeTabs } from "./code-tabs";
 import { CostCalculator } from "./cost-calculator";
 import { Reveal } from "@/components/Reveal";
-import { CountUp } from "@/components/CountUp";
 import { Marquee } from "@/components/Marquee";
 import { RotatingWord } from "@/components/RotatingWord";
+import { CursorGlow } from "@/components/CursorGlow";
+import { TiltCard } from "@/components/TiltCard";
+import { LiveDashboard } from "@/components/LiveDashboard";
 
 /* ---------------------------------- data ---------------------------------- */
 
@@ -170,65 +172,14 @@ const faqs = [
   },
 ];
 
-/* ------------------------------ dashboard mock ----------------------------- */
-
-function DashboardMock() {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)]">
-      <div className="flex items-center gap-2 border-b border-zinc-800/80 px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-        <span className="ml-3 font-mono text-xs text-zinc-500">app.protai.co.uk/dashboard</span>
-        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">
-          <span className="live-ping relative inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
-          Live
-        </span>
-      </div>
-      <div className="grid grid-cols-3 gap-px bg-zinc-800/60">
-        {[
-          { label: "Checks today", value: <CountUp to={48201} />, sub: "+12% vs yesterday" },
-          { label: "Tokens reported", value: <><CountUp to={1.9} decimals={1} />M</>, sub: "across 3 meters" },
-          { label: "Users over 80%", value: <CountUp to={7} />, sub: "2 alerted by email" },
-        ].map((s) => (
-          <div key={s.label} className="bg-zinc-950 px-5 py-4">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">{s.label}</p>
-            <p className="mt-1 font-mono text-xl font-semibold text-zinc-50">{s.value}</p>
-            <p className="mt-0.5 text-[11px] text-zinc-500">{s.sub}</p>
-          </div>
-        ))}
-      </div>
-      <div className="space-y-2 px-4 py-4">
-        {[
-          { user: "user_8f2a", meter: "tokens", pct: 92, hot: true },
-          { user: "user_1c9d", meter: "tokens", pct: 84, hot: true },
-          { user: "user_77b1", meter: "generations", pct: 61, hot: false },
-          { user: "user_3e55", meter: "tokens", pct: 44, hot: false },
-        ].map((r) => (
-          <div key={r.user} className="flex items-center gap-3 rounded-xl bg-zinc-900/60 px-4 py-2.5">
-            <span className="font-mono text-xs text-zinc-400">{r.user}</span>
-            <span className="rounded-md bg-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">{r.meter}</span>
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-              <div
-                className={`h-full rounded-full ${r.hot ? "bg-amber-400" : "bg-emerald-500"}`}
-                style={{ width: `${r.pct}%` }}
-              />
-            </div>
-            <span className={`font-mono text-xs ${r.hot ? "text-amber-300" : "text-zinc-400"}`}>{r.pct}%</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ---------------------------------- page ----------------------------------- */
 
 export default function LandingPage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden">
+      <section className="noise relative overflow-hidden">
+        <CursorGlow />
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="aurora-orb absolute -top-32 left-[8%] h-96 w-96 rounded-full bg-emerald-500/12" />
           <div className="aurora-orb absolute top-10 right-[5%] h-80 w-80 rounded-full bg-sky-500/10" style={{ animationDelay: "-5s" }} />
@@ -245,62 +196,70 @@ export default function LandingPage() {
             WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)",
           }}
         />
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <Reveal>
-              <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 py-1.5 pl-1.5 pr-3.5">
-                <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-semibold text-zinc-950">New</span>
-                <span className="text-xs text-zinc-400">Stripe credit packs are live — sell top-ups in minutes</span>
-              </div>
-            </Reveal>
-            <Reveal delay={100}>
-              <h1 className="mt-7 text-4xl font-semibold leading-[1.08] tracking-tight text-zinc-50 sm:text-6xl">
-                Give every user a balance.<br />
-                <span className="text-zinc-500">Keep your </span>
-                <RotatingWord
-                  words={["AI bill", "token spend", "margins", "budget"]}
-                  className="text-shimmer bg-gradient-to-r from-emerald-300 via-emerald-400 to-sky-400 bg-clip-text text-transparent"
-                />
-                <span className="text-zinc-500"> under control.</span>
-              </h1>
-            </Reveal>
-            <Reveal delay={200}>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
-                ProtAI is credit metering for AI apps. Set per-user quotas on tokens,
-                generations, or API calls, get alerted before spend spikes, and stop
-                runaway usage in one click. Works with OpenAI, Anthropic, and any other
-                provider. Live in three lines of code, no proxy.
-              </p>
-            </Reveal>
-            <Reveal delay={300}>
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Link
-                  href="/signup"
-                  className="w-full rounded-xl bg-emerald-500 px-7 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 sm:w-auto"
-                >
-                  Start free
-                </Link>
-                <Link
-                  href="/docs"
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-7 py-3 text-sm font-medium text-zinc-100 transition hover:border-zinc-500 sm:w-auto"
-                >
-                  Read the docs
-                </Link>
-              </div>
-              <p className="mt-4 font-mono text-xs text-zinc-600">
-                npm i protai&nbsp;&nbsp;·&nbsp;&nbsp;pip install protai&nbsp;&nbsp;·&nbsp;&nbsp;no credit card
+        <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-14 sm:px-6 sm:pt-20">
+          <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+            {/* Copy */}
+            <div>
+              <Reveal>
+                <p className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-medium text-emerald-300">
+                  <span className="live-ping relative inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
+                  Live: metering 48k checks today
+                </p>
+              </Reveal>
+              <Reveal delay={100}>
+                <h1 className="mt-6 text-5xl font-semibold leading-[1.02] tracking-tight text-zinc-50 sm:text-6xl lg:text-7xl">
+                  Give every user a balance.
+                  <br />
+                  <span className="text-zinc-500">Keep your </span>
+                  <RotatingWord
+                    words={["AI bill", "token spend", "margins", "budget"]}
+                    className="text-shimmer bg-gradient-to-r from-emerald-300 via-emerald-400 to-sky-400 bg-clip-text text-transparent"
+                  />
+                  <br />
+                  <span className="text-zinc-500">under control.</span>
+                </h1>
+              </Reveal>
+              <Reveal delay={200}>
+                <p className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-400">
+                  ProtAI is credit metering for AI apps. Set per-user quotas on tokens,
+                  generations, or API calls, get alerted before spend spikes, and stop
+                  runaway usage in one click. Works with OpenAI, Anthropic, and any other
+                  provider. Live in three lines of code, no proxy.
+                </p>
+              </Reveal>
+              <Reveal delay={300}>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href="/signup"
+                    className="rounded-xl bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+                  >
+                    Start free
+                  </Link>
+                  <Link
+                    href="/docs"
+                    className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-7 py-3.5 text-sm font-medium text-zinc-100 transition hover:border-zinc-500"
+                  >
+                    Read the docs
+                  </Link>
+                </div>
+                <p className="mt-4 font-mono text-xs text-zinc-600">
+                  npm i protai&nbsp;&nbsp;·&nbsp;&nbsp;pip install protai&nbsp;&nbsp;·&nbsp;&nbsp;no credit card
+                </p>
+              </Reveal>
+            </div>
+
+            {/* Live product */}
+            <Reveal delay={250} y={40}>
+              <TiltCard max={8}>
+                <div className="border-beam">
+                  <LiveDashboard />
+                </div>
+              </TiltCard>
+              <p className="mt-4 text-center text-xs text-zinc-600">
+                Not a mockup. This is the real dashboard, simulated live. Move your mouse over it.
               </p>
             </Reveal>
           </div>
-
-          <Reveal delay={200} y={40}>
-            <div className="mx-auto mt-14 max-w-4xl">
-              <DashboardMock />
-              <p className="mt-3 text-center text-xs text-zinc-600">
-                Your actual dashboard, per-user usage in real time.
-              </p>
-            </div>
-          </Reveal>
         </div>
       </section>
 
@@ -392,13 +351,37 @@ export default function LandingPage() {
           </h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 3) * 100}>
+              <Reveal
+                key={f.title}
+                delay={(i % 3) * 100}
+                className={i === 0 ? "sm:col-span-2 lg:col-span-2" : ""}
+              >
                 <div className="lift-card group h-full rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-zinc-700">
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-300">
                     {f.icon}
                   </span>
                   <h3 className="mt-4 font-medium text-zinc-100">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">{f.body}</p>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-400">{f.body}</p>
+                  {i === 0 && (
+                    <div className="mt-5 space-y-2.5">
+                      {[
+                        { user: "user_8f2a", pct: 92, hot: true },
+                        { user: "user_1c9d", pct: 61, hot: false },
+                        { user: "user_77b1", pct: 34, hot: false },
+                      ].map((r) => (
+                        <div key={r.user} className="flex items-center gap-3">
+                          <span className="w-20 font-mono text-xs text-zinc-500">{r.user}</span>
+                          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                            <div
+                              className={`h-full rounded-full ${r.hot ? "bg-amber-400" : "bg-emerald-500"}`}
+                              style={{ width: `${r.pct}%` }}
+                            />
+                          </div>
+                          <span className="w-10 text-right font-mono text-xs text-zinc-500">{r.pct}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </Reveal>
             ))}

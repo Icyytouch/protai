@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const tabs = [
   {
@@ -54,11 +54,49 @@ curl -X POST https://protai.co.uk/api/v1/report \\
   },
 ];
 
+/** Code block that types itself when scrolled into view or when switching tabs. */
 export function CodeTabs() {
   const [active, setActive] = useState("js");
+  const [typed, setTyped] = useState("");
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const tab = tabs.find((t) => t.id === active)!;
+
+  // Start typing when scrolled into view.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setStarted(true);
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Type the active tab's code.
+  useEffect(() => {
+    if (!started) return;
+    setTyped("");
+    let i = 0;
+    const code = tab.code;
+    const id = setInterval(() => {
+      i += 3;
+      setTyped(code.slice(0, i));
+      if (i >= code.length) clearInterval(id);
+    }, 12);
+    return () => clearInterval(id);
+  }, [active, started, tab.code]);
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70">
+    <div ref={ref} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70">
       <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
         <div className="flex gap-1.5">
           {tabs.map((t) => (
@@ -78,8 +116,11 @@ export function CodeTabs() {
         </div>
         <span className="hidden font-mono text-xs text-zinc-600 sm:inline">3 lines. Any provider.</span>
       </div>
-      <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-zinc-300">
-        <code>{tab.code}</code>
+      <pre className="min-h-[280px] overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-zinc-300">
+        <code>
+          {typed}
+          <span className="typing-caret">▍</span>
+        </code>
       </pre>
     </div>
   );
