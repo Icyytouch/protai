@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getUser } from "@/components/supabase/server";
 import { PageHeader, EmptyState, Card, Badge } from "@/components/ui";
+import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { CreateProjectForm } from "./create-project-form";
 import type { Project } from "./_types";
 
@@ -23,12 +24,23 @@ export default async function DashboardHome() {
       </Card>
 
       {projects.length === 0 ? (
-        <EmptyState
-          title="No projects yet"
-          sub="Create your first project above, then grab an API key and define a meter. You'll be metering usage in minutes."
-        />
+        <>
+          <PageHeader
+            title="Welcome to ProtAI"
+            sub="Let's get your first project metering usage in under two minutes."
+          />
+          <OnboardingWizard />
+        </>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <>
+          <PageHeader
+            title="Projects"
+            sub="Each project is one AI app with its own API keys, meters, and guardrails."
+          />
+          <Card className="mb-8">
+            <CreateProjectForm />
+          </Card>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((p) => (
             <Link
               key={p.id}
@@ -47,7 +59,8 @@ export default async function DashboardHome() {
               <p className="mt-4 text-sm text-emerald-400">Open dashboard →</p>
             </Link>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </>
   );

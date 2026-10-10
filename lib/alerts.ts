@@ -3,6 +3,7 @@ import { after } from 'next/server';
 import { createAdminSupabaseClient } from './supabase-admin';
 import { currentPeriod, toNum, type Meter } from './metering';
 import { sendEmail } from './email';
+import { fireWebhooks } from './webhooks';
 
 /**
  * Threshold-alert detection + email delivery.
@@ -64,6 +65,23 @@ export async function evaluateAlerts(
           console.error('[alerts] email failed:', err),
         ),
       );
+      fireWebhooks(projectId, 'usage.threshold', {
+        meter_slug: meter.slug,
+        end_user_id: endUserId,
+        usage_pct: Math.round(usagePct * 100) / 100,
+        threshold_pct: firedThreshold,
+        balance_after: balance,
+      });
+    }
+
+    // Quota exhausted: balance hit zero after this call.
+    if (balance <= 0) {
+      fireWebhooks(projectId, 'quota.exhausted', {
+        meter_slug: meter.slug,
+        end_user_id: endUserId,
+        usage_pct: 100,
+        balance_after: balance,
+      });
     }
   } catch {
     // Alert evaluation must never fail a metering request.

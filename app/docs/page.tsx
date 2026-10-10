@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { Playground } from "@/components/Playground";
 
 function Code({ children }: { children: string }) {
   return (
@@ -76,8 +77,12 @@ export default function DocsPage() {
         </h1>
         <p className="mt-3 max-w-2xl text-zinc-400">
           Meter your first user in five minutes. You need a ProtAI account and an API key —
-          both free.
+          both free. Or skip the setup and try the live API right now:
         </p>
+
+        <div className="mt-8">
+          <Playground />
+        </div>
 
         <H2>1. Install the SDK</H2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -209,6 +214,108 @@ await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
   -H "Authorization: Bearer ptk_YOUR_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"end_user_id":"user_123","meter":"tokens","units":1}'`}</Code>
+        </div>
+
+        <H2>Framework quickstarts</H2>
+        <P>Drop-in patterns for the most common stacks:</P>
+
+        <h3 className="mt-6 font-medium text-zinc-100">Next.js API route</h3>
+        <div className="mt-3">
+          <Code>{`// app/api/generate/route.ts
+import { ProtAI } from "@protai/sdk";
+const protai = new ProtAI(process.env.PROTAI_API_KEY!);
+
+export async function POST(req: Request) {
+  const { userId, prompt } = await req.json();
+
+  const check = await protai.check(userId, "tokens");
+  if (!check.allowed) {
+    return Response.json(
+      { error: "Out of credits", balance: check.balance },
+      { status: check.reason === "killed" ? 503 : 402 }
+    );
+  }
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o", messages: [{ role: "user", content: prompt }],
+  });
+  await protai.report(userId, "tokens", completion.usage!.total_tokens);
+
+  return Response.json({ text: completion.choices[0].message.content });
+}`}</Code>
+        </div>
+
+        <h3 className="mt-6 font-medium text-zinc-100">Express middleware</h3>
+        <div className="mt-3">
+          <Code>{`// middleware/protai.js
+import { ProtAI } from "@protai/sdk";
+const protai = new ProtAI(process.env.PROTAI_API_KEY);
+
+export function meter(meterSlug) {
+  return async (req, res, next) => {
+    const userId = req.user.id; // from your auth
+    const check = await protai.check(userId, meterSlug);
+    if (!check.allowed) {
+      return res.status(402).json({ error: "Out of credits", balance: check.balance });
+    }
+    // stash for the route to report actual usage after the AI call
+    req.protai = { userId, meterSlug };
+    next();
+  };
+}
+
+// usage:
+app.post("/api/generate", meter("tokens"), async (req, res) => {
+  const out = await runModel(req.body.prompt);
+  await protai.report(req.protai.userId, "tokens", out.tokensUsed);
+  res.json(out);
+});`}</Code>
+        </div>
+
+        <h3 className="mt-6 font-medium text-zinc-100">FastAPI dependency</h3>
+        <div className="mt-3">
+          <Code>{`# deps.py
+from protai import ProtAI
+from fastapi import Depends, HTTPException
+
+protai = ProtAI(api_key=os.environ["PROTAI_API_KEY"])
+
+async def metered(user_id: str, meter: str = "tokens"):
+    check = await protai.check(user_id, meter)
+    if not check.allowed:
+        raise HTTPException(
+            status_code=402,
+            detail={"error": "Out of credits", "balance": check.balance},
+        )
+    return {"user_id": user_id, "meter": meter}
+
+# usage:
+@app.post("/generate")
+async def generate(prompt: str, ctx=Depends(lambda: metered(current_user.id))):
+    out = await run_model(prompt)
+    await protai.report(ctx["user_id"], "tokens", out.tokens_used)
+    return out`}</Code>
+        </div>
+
+        <H2>Webhooks</H2>
+        <P>
+          Push quota events to your own backend instead of polling. Add an endpoint in the dashboard
+          under <strong className="text-zinc-200">Webhooks</strong> — ProtAI signs every delivery with
+          an <code className="font-mono text-xs text-zinc-200">X-ProtAI-Signature</code> header
+          (<code className="font-mono text-xs">sha256=HMAC(your_secret, body)</code>):
+        </P>
+        <div className="mt-4">
+          <Code>{`// verify in your endpoint (Node example)
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+const sig = req.headers["x-protai-signature"]; // "sha256=…"
+const expected = "sha256=" + createHmac("sha256", process.env.PROTAI_WEBHOOK_SECRET)
+  .update(JSON.stringify(req.body)).digest("hex");
+if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+  return res.status(401).end();
+}
+// body: { event, project_id, meter_slug, end_user_id, usage_pct, balance_after, occurred_at }
+// events: usage.threshold · quota.exhausted · kill_switch.toggled`}</Code>
         </div>
 
         <div className="mt-12 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.05] p-6 text-center">

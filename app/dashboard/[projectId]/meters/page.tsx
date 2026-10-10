@@ -1,5 +1,6 @@
 import { getUser } from "@/components/supabase/server";
 import { PageHeader, EmptyState, TableShell, Th, Td } from "@/components/ui";
+import { PlanUsage } from "@/components/dashboard/PlanUsage";
 import { CreateMeterButton, MeterButtons, OverageBadge } from "./meter-forms";
 import type { Meter } from "@/app/dashboard/_types";
 
@@ -21,6 +22,9 @@ export default async function MetersPage({ params }: { params: Promise<{ project
         sub="A meter is anything you bill usage for — tokens, generations, minutes. Reference it by slug in API calls."
         action={<CreateMeterButton projectId={projectId} />}
       />
+      <div className="mb-6">
+        <PlanUsage projectId={projectId} />
+      </div>
       {meters.length === 0 ? (
         <EmptyState
           title="No meters yet"

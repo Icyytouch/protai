@@ -16,6 +16,7 @@ export async function GET() {
   const { data, error } = await ctx.supabase
     .from('projects')
     .select('id, name, kill_switch, created_at, subscriptions (tier, status)')
+    .neq('name', '__playground_demo__')
     .order('created_at', { ascending: true });
 
   if (error) return NextResponse.json({ error: 'Failed to list projects' }, { status: 500 });
