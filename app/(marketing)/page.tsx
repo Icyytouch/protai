@@ -244,7 +244,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
                 <p className="mt-4 font-mono text-xs text-zinc-600">
-                  npm i protai&nbsp;&nbsp;·&nbsp;&nbsp;pip install protai&nbsp;&nbsp;·&nbsp;&nbsp;no credit card
+                  npm i @protai/sdk&nbsp;&nbsp;·&nbsp;&nbsp;pip install protai&nbsp;&nbsp;·&nbsp;&nbsp;no credit card
                 </p>
               </Reveal>
             </div>

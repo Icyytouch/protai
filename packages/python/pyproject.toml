@@ -27,7 +27,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://protai.co.uk"
 Documentation = "https://protai.co.uk/docs"
-Repository = "https://github.com/protai/protai.git"
+Repository = "https://github.com/Icyytouch/protai.git"
 
 [tool.setuptools.packages.find]
 where = ["src"]

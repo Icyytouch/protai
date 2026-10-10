@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireSession } from '@/lib/api';
+import { checkProjectLimit } from '@/lib/tiers';
 
 
 const CreateProject = z.object({
@@ -48,6 +49,15 @@ export async function POST(req: NextRequest) {
   const parsed = CreateProject.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+  }
+
+  // Enforce the plan's project limit before creating.
+  const limit = await checkProjectLimit(ctx.userId);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: limit.message, upgrade_tier: limit.upgradeTier, code: 'plan_limit' },
+      { status: 402 }
+    );
   }
 
   const { data: project, error } = await ctx.supabase

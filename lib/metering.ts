@@ -104,6 +104,22 @@ export async function getOrCreateBalance(
 
   if (data) return data as BalanceRow;
 
+  // New balance row needed. If this end user has never been seen on the
+  // project before, enforce the plan's end-user limit first.
+  const { data: seen } = await db
+    .from('balances')
+    .select('id')
+    .eq('project_id', projectId)
+    .eq('end_user_id', endUserId)
+    .limit(1);
+  if (!seen || seen.length === 0) {
+    const { checkEndUserLimit } = await import('./tiers');
+    const limit = await checkEndUserLimit(projectId);
+    if (!limit.ok) {
+      throw new PlanLimitError(limit.message, limit.upgradeTier);
+    }
+  }
+
   const { data: created, error } = await db
     .from('balances')
     .upsert(
@@ -115,6 +131,16 @@ export async function getOrCreateBalance(
 
   if (error || !created) throw new Error('Failed to create balance row');
   return created as BalanceRow;
+}
+
+/** Thrown when a plan limit blocks an operation. Routes map this to 402. */
+export class PlanLimitError extends Error {
+  upgradeTier: string;
+  constructor(message: string, upgradeTier: string) {
+    super(message);
+    this.name = 'PlanLimitError';
+    this.upgradeTier = upgradeTier;
+  }
 }
 
 export interface CheckResult {
@@ -170,14 +196,11 @@ export interface ReportResult {
 }
 
 /**
- * Deduct `units` from the user's balance. With overage='block' the call is
+ * Deduct `units` from the user's balance. Uses the atomic `deduct_balance`
+ * Postgres function: a single statement with row locking, safe under
+ * concurrent load. With overage='block' the call is
  * rejected when it would exceed balance+quota; with 'allow_alert' the
  * balance may go negative.
- *
- * NOTE (concurrency): this is read-modify-write. Under extreme concurrent
- * load for the SAME end_user+meter, two requests could both pass the quota
- * check. Mitigation for later: SELECT ... FOR UPDATE or a Postgres function.
- * The 100 req/min/key rate limit makes this a non-issue at MVP scale.
  */
 export async function reportUsage(
   ctx: KeyContext,
@@ -193,16 +216,37 @@ export async function reportUsage(
   }
 
   const db = admin();
-  const row = await getOrCreateBalance(ctx.projectId, meter.id, endUserId, period);
-  const balance = toNum(row.balance);
 
-  if (meter.overage === 'block' && balance + quota - units < 0) {
-    return { ok: false, balance, reason: 'insufficient' };
+  // Ensure the row exists (and the end-user plan limit is respected for new users).
+  await getOrCreateBalance(ctx.projectId, meter.id, endUserId, period);
+
+  // Atomic deduction via Postgres function (row lock, single statement).
+  const { data, error } = await db.rpc('deduct_balance', {
+    p_project_id: ctx.projectId,
+    p_meter_id: meter.id,
+    p_end_user_id: endUserId,
+    p_period: period,
+    p_units: units,
+    p_quota: quota,
+    p_allow_negative: meter.overage === 'allow_alert',
+  });
+
+  if (error) {
+    if (error.message?.includes('insufficient_quota')) {
+      const { data: row } = await db
+        .from('balances')
+        .select('balance')
+        .eq('project_id', ctx.projectId)
+        .eq('meter_id', meter.id)
+        .eq('end_user_id', endUserId)
+        .eq('period', period)
+        .single();
+      return { ok: false, balance: toNum((row as { balance?: number } | null)?.balance ?? 0), reason: 'insufficient' };
+    }
+    throw new Error('Failed to update balance');
   }
 
-  const newBalance = balance - units;
-  const { error } = await db.from('balances').update({ balance: newBalance }).eq('id', row.id);
-  if (error) throw new Error('Failed to update balance');
+  const newBalance = toNum(data);
 
   await db.from('ledger').insert({
     project_id: ctx.projectId,

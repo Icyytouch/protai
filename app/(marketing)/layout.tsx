@@ -59,7 +59,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               Credit metering for AI apps. Per-user balances, spend alerts,
               and a kill-switch, live in three lines of code.
             </p>
-            <p className="mt-4 font-mono text-xs text-zinc-600">npm i protai · pip install protai</p>
+            <p className="mt-4 font-mono text-xs text-zinc-600">npm i @protai/sdk · pip install protai</p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Product</p>

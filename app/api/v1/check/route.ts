@@ -4,6 +4,7 @@ import {
   authenticateApiKey,
   checkUsage,
   getMeter,
+  PlanLimitError,
 } from '@/lib/metering';
 import { evaluateAlerts } from '@/lib/alerts';
 import { checkRateLimit } from '@/lib/rate-limit';
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid or missing API key' }, { status: 401 });
   }
 
-  const rl = checkRateLimit(`v1:${ctx.keyId}`);
+  const rl = await checkRateLimit(`v1:${ctx.keyId}`);
   if (!rl.ok) {
     return NextResponse.json(
       { error: 'Rate limit exceeded', retry_after: rl.retryAfterSec },
@@ -52,7 +53,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Unknown meter: ${meterSlug}` }, { status: 404 });
   }
 
-  const result = await checkUsage(ctx, meter, end_user_id, units);
+  let result;
+  try {
+    result = await checkUsage(ctx, meter, end_user_id, units);
+  } catch (err) {
+    if (err instanceof PlanLimitError) {
+      return NextResponse.json(
+        { error: err.message, upgrade_tier: err.upgradeTier, code: 'plan_limit' },
+        { status: 402 }
+      );
+    }
+    throw err;
+  }
 
   // Best-effort alert evaluation; never fails the request.
   if (result.allowed) {

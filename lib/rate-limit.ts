@@ -1,46 +1,40 @@
+import { createAdminSupabaseClient } from './supabase-admin';
+
 /**
- * Simple in-memory per-key rate limiter: 100 requests / 60 seconds.
- *
- * NOTE: state lives in this process only. On multi-instance deployments
- * (e.g. several Vercel regions) each instance enforces its own budget.
- * If strict global limiting is ever needed, replace with Upstash Redis.
+ * Distributed rate limiter backed by Postgres (rate_limits table).
+ * Every serverless instance shares the same counters, so the limit holds
+ * globally — unlike the old in-memory version. One RPC round-trip per call.
  */
-
-interface Bucket {
-  count: number;
-  resetAt: number;
-}
-
-const buckets = new Map<string, Bucket>();
 
 const DEFAULT_LIMIT = 100;
 const DEFAULT_WINDOW_MS = 60_000;
-const MAX_BUCKETS = 20_000;
 
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
   limit: number = DEFAULT_LIMIT,
   windowMs: number = DEFAULT_WINDOW_MS,
-): { ok: boolean; retryAfterSec: number } {
-  const now = Date.now();
-  let bucket = buckets.get(key);
-
-  if (!bucket || now >= bucket.resetAt) {
-    bucket = { count: 0, resetAt: now + windowMs };
-    buckets.set(key, bucket);
-  }
-
-  // Opportunistic cleanup so the map cannot grow unbounded.
-  if (buckets.size > MAX_BUCKETS) {
-    for (const [k, v] of buckets) {
-      if (v.resetAt <= now) buckets.delete(k);
-      if (buckets.size <= MAX_BUCKETS) break;
+): Promise<{ ok: boolean; retryAfterSec: number }> {
+  try {
+    const now = Date.now();
+    const windowStart = new Date(Math.floor(now / windowMs) * windowMs).toISOString();
+    const db = createAdminSupabaseClient();
+    const { data, error } = await db.rpc('rate_limit_hit', {
+      p_bucket_key: key,
+      p_window_start: windowStart,
+    });
+    if (error || typeof data !== 'number') {
+      // Fail open on DB errors: never block legitimate traffic because
+      // the limiter itself is down. Logged server-side.
+      console.error('[rate-limit] rpc failed, failing open:', error?.message);
+      return { ok: true, retryAfterSec: 0 };
     }
+    if (data > limit) {
+      const retryAfterSec = Math.ceil((Math.floor(now / windowMs) * windowMs + windowMs - now) / 1000);
+      return { ok: false, retryAfterSec };
+    }
+    return { ok: true, retryAfterSec: 0 };
+  } catch (err) {
+    console.error('[rate-limit] unexpected error, failing open:', err);
+    return { ok: true, retryAfterSec: 0 };
   }
-
-  bucket.count += 1;
-  if (bucket.count > limit) {
-    return { ok: false, retryAfterSec: Math.ceil((bucket.resetAt - now) / 1000) };
-  }
-  return { ok: true, retryAfterSec: 0 };
 }

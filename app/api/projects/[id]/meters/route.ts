@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireProject } from '@/lib/api';
+import { checkMeterLimit } from '@/lib/tiers';
 
 
 const Slug = z.string().min(1).max(64).regex(/^[a-z0-9][a-z0-9_-]*$/, 'slug must be lowercase alphanumeric with dashes/underscores');
@@ -45,6 +46,15 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   const parsed = CreateMeter.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+  }
+
+  // Enforce the plan's per-project meter limit before creating.
+  const limit = await checkMeterLimit(id);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: limit.message, upgrade_tier: limit.upgradeTier, code: 'plan_limit' },
+      { status: 402 }
+    );
   }
 
   const { data, error } = await ctx.supabase

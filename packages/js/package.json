@@ -1,1 +1,41 @@
-{"author":"ProtAI","description":"Official JavaScript/TypeScript SDK for ProtAI — drop-in credit metering and spend guardrails for AI apps.","devDependencies":{"typescript":"^5.9.3"},"engines":{"node":">=18"},"files":["dist","README.md","LICENSE"],"keywords":["protai","metering","credits","usage","ai","billing","guardrails"],"license":"MIT","main":"dist/index.js","name":"@protai/sdk","publishConfig":{"access":"public"},"repository":{"directory":"packages/js","type":"git","url":"https://github.com/protai/protai.git"},"scripts":{"build":"node ../../node_modules/typescript/bin/tsc -p tsconfig.json","prepublishOnly":"npm run build"},"types":"dist/index.d.ts","version":"0.1.0"}
+{
+  "author": "ProtAI",
+  "description": "Official JavaScript/TypeScript SDK for ProtAI \u2014 drop-in credit metering and spend guardrails for AI apps.",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "protai",
+    "metering",
+    "credits",
+    "usage",
+    "ai",
+    "billing",
+    "guardrails"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "name": "@protai/sdk",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "directory": "packages/js",
+    "type": "git",
+    "url": "https://github.com/Icyytouch/protai.git"
+  },
+  "scripts": {
+    "build": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "types": "dist/index.d.ts",
+  "version": "0.1.0"
+}

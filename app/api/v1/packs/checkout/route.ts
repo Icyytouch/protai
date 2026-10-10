@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid or missing API key' }, { status: 401 });
   }
 
-  const rl = checkRateLimit(`v1:${ctx.keyId}`);
+  const rl = await checkRateLimit(`v1:${ctx.keyId}`);
   if (!rl.ok) {
     return NextResponse.json(
       { error: 'Rate limit exceeded', retry_after: rl.retryAfterSec },
