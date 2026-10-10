@@ -7,6 +7,7 @@ import { RotatingWord } from "@/components/RotatingWord";
 import { CursorGlow } from "@/components/CursorGlow";
 import { TiltCard } from "@/components/TiltCard";
 import { LiveDashboard } from "@/components/LiveDashboard";
+import { FlowDiagram } from "@/components/FlowDiagram";
 
 /* ---------------------------------- data ---------------------------------- */
 
@@ -321,6 +322,11 @@ export default function LandingPage() {
               </Link>
             </div>
             <div>
+              <Reveal>
+                <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
+                  <FlowDiagram />
+                </div>
+              </Reveal>
               <div className="space-y-4">
                 {steps.map((s, i) => (
                   <Reveal key={s.n} delay={i * 100}>

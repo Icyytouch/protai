@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { Suspense } from "react";
 import { Logo } from "@/components/Logo";
-import { NavigationProgress } from "@/components/NavigationProgress";
 import { PageFade } from "@/components/PageFade";
 
 const productLinks = [
@@ -21,9 +19,6 @@ const resourceLinks = [
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Suspense fallback={null}>
-        <NavigationProgress />
-      </Suspense>
       <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Logo />

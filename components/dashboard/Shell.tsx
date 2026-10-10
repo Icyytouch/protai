@@ -18,8 +18,10 @@ const nav = [
 ];
 
 const staffNav = [
+  { href: "/dashboard/admin", label: "Overview", icon: "M3 12l9-9 9 9M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" },
   { href: "/dashboard/admin/posts", label: "Blog posts", icon: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" },
   { href: "/dashboard/admin/team", label: "Team", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m22 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" },
+  { href: "/dashboard/admin/users", label: "Users", icon: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M13 7a4 4 0 0 1 0 7.75M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" },
 ];
 
 function NavItem({ href, icon, label, active, onClick }: {
@@ -136,16 +138,22 @@ export function Shell({
             <p className="mb-1.5 mt-5 px-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
               Site admin
             </p>
-            {staffNav.map((item) => (
-              <NavItem
-                key={item.href}
-                href={item.href}
-                icon={item.icon}
-                label={item.label}
-                active={pathname === item.href || pathname.startsWith(item.href + "/")}
-                onClick={() => setOpen(false)}
-              />
-            ))}
+            {staffNav.map((item) => {
+              const isOverview = item.href === "/dashboard/admin";
+              const active = isOverview
+                ? pathname === item.href
+                : pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <NavItem
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  active={active}
+                  onClick={() => setOpen(false)}
+                />
+              );
+            })}
           </>
         )}
       </div>

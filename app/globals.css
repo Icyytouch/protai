@@ -167,3 +167,11 @@ body {
   animation: caret-blink 0.9s step-end infinite;
   color: #34d399;
 }
+
+/* Flowing dashes on the flow diagram */
+@keyframes flow-dash-move {
+  to { stroke-dashoffset: -36; }
+}
+.flow-dash {
+  animation: flow-dash-move 1.2s linear infinite;
+}

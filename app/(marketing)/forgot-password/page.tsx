@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/components/supabase/client";
-import { Logo } from "@/components/Logo";
+import { AuthShell } from "@/components/AuthShell";
 import { Field, inputClass, btnPrimaryClass } from "@/components/ui";
 
 function baseUrl(): string {
@@ -36,55 +36,51 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col justify-center px-4 py-16">
-      <div className="mb-8 flex justify-center">
-        <Logo />
-      </div>
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-8">
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-50">Reset your password</h1>
-        {sent ? (
-          <>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-              If an account exists for <span className="text-zinc-200">{email}</span>, a reset
-              link is on its way. Check your inbox (and spam) — the link expires in an hour.
+    <AuthShell
+      title="Reset your password"
+      subtitle="Enter your account email and we'll send you a reset link."
+      footer={
+        <>
+          Remembered it?{" "}
+          <Link href="/login" className="font-medium text-emerald-400 hover:text-emerald-300">
+            Log in
+          </Link>
+        </>
+      }
+    >
+      {sent ? (
+        <>
+          <p className="text-sm leading-relaxed text-zinc-400">
+            If an account exists for <span className="text-zinc-200">{email}</span>, a reset
+            link is on its way. Check your inbox (and spam) — the link expires in an hour.
+          </p>
+          <Link href="/login" className={`${btnPrimaryClass} mt-6 block text-center !py-3`}>
+            Back to log in
+          </Link>
+        </>
+      ) : (
+        <form onSubmit={onSubmit} className="space-y-4">
+          <Field label="Email">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className={inputClass}
+              autoComplete="email"
+            />
+          </Field>
+          {error && (
+            <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm text-red-300">
+              {error}
             </p>
-            <Link href="/login" className={`${btnPrimaryClass} mt-6 block text-center`}>
-              Back to log in
-            </Link>
-          </>
-        ) : (
-          <>
-            <p className="mt-1 text-sm text-zinc-500">Enter your account email and we'll send you a reset link.</p>
-            <form onSubmit={onSubmit} className="mt-6 space-y-4">
-              <Field label="Email">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className={inputClass}
-                  autoComplete="email"
-                />
-              </Field>
-              {error && (
-                <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm text-red-300">
-                  {error}
-                </p>
-              )}
-              <button type="submit" disabled={loading} className={`${btnPrimaryClass} w-full`}>
-                {loading ? "Sending…" : "Send reset link"}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
-      <p className="mt-6 text-center text-sm text-zinc-500">
-        Remembered it?{" "}
-        <Link href="/login" className="font-medium text-emerald-400 hover:text-emerald-300">
-          Log in
-        </Link>
-      </p>
-    </div>
+          )}
+          <button type="submit" disabled={loading} className={`${btnPrimaryClass} w-full !py-3`}>
+            {loading ? "Sending…" : "Send reset link"}
+          </button>
+        </form>
+      )}
+    </AuthShell>
   );
 }

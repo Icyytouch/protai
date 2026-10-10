@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <PageHeader title="Site admin" sub={`Signed in as ${role}. Manage the blog and team here.`} />
+      <PageHeader title="Site admin" sub={`Signed in as ${role}. Everything about your site, in one place.`} />
       {children}
     </>
   );
