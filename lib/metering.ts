@@ -184,6 +184,7 @@ export async function checkUsage(
     units,
     kind: 'check',
     balance_after: balance,
+    note: reason ?? null,
   });
 
   return { allowed, balance, quota, ...(reason ? { reason } : {}) };
@@ -210,12 +211,20 @@ export async function reportUsage(
 ): Promise<ReportResult> {
   const period = currentPeriod();
   const quota = toNum(meter.monthly_quota);
+  const db = admin();
 
   if (ctx.killSwitch) {
+    await db.from('ledger').insert({
+      project_id: ctx.projectId,
+      meter_id: meter.id,
+      end_user_id: endUserId,
+      units,
+      kind: 'report',
+      balance_after: 0,
+      note: 'killed',
+    });
     return { ok: false, balance: 0, reason: 'killed' };
   }
-
-  const db = admin();
 
   // Ensure the row exists (and the end-user plan limit is respected for new users).
   await getOrCreateBalance(ctx.projectId, meter.id, endUserId, period);
@@ -241,7 +250,17 @@ export async function reportUsage(
         .eq('end_user_id', endUserId)
         .eq('period', period)
         .single();
-      return { ok: false, balance: toNum((row as { balance?: number } | null)?.balance ?? 0), reason: 'insufficient' };
+      const bal = toNum((row as { balance?: number } | null)?.balance ?? 0);
+      await db.from('ledger').insert({
+        project_id: ctx.projectId,
+        meter_id: meter.id,
+        end_user_id: endUserId,
+        units,
+        kind: 'report',
+        balance_after: bal,
+        note: 'insufficient',
+      });
+      return { ok: false, balance: bal, reason: 'insufficient' };
     }
     throw new Error('Failed to update balance');
   }

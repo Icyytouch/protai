@@ -3,6 +3,8 @@ import { getUser } from "@/components/supabase/server";
 import { PageHeader, Stat, Card, Badge, EmptyState } from "@/components/ui";
 import { PlanUsage } from "@/components/dashboard/PlanUsage";
 import { SpendChart } from "@/components/dashboard/SpendChart";
+import { SpendRiverCard } from "@/components/dashboard/SpendRiverCard";
+import { InsightsCard } from "@/components/dashboard/InsightsCard";
 import { KillSwitchToggle } from "./kill-switch";
 import { currentPeriod, formatDateTime, type LedgerRow } from "@/app/dashboard/_types";
 
@@ -61,6 +63,8 @@ export default async function ProjectOverview({
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
+        <SpendRiverCard projectId={projectId} />
+        <InsightsCard projectId={projectId} />
         <SpendChart projectId={projectId} />
         <Card>
           <h2 className="mb-4 font-medium text-zinc-100">Setup checklist</h2>

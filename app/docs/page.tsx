@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Playground } from "@/components/Playground";
+import { DocsToc } from "@/components/DocsToc";
 
 function Code({ children }: { children: string }) {
   return (
@@ -10,8 +11,8 @@ function Code({ children }: { children: string }) {
   );
 }
 
-function H2({ children }: { children: React.ReactNode }) {
-  return <h2 className="mt-12 text-xl font-semibold tracking-tight text-zinc-50">{children}</h2>;
+function H2({ children, id }: { children: React.ReactNode; id?: string }) {
+  return <h2 id={id} className="mt-12 scroll-mt-24 text-xl font-semibold tracking-tight text-zinc-50">{children}</h2>;
 }
 
 function P({ children }: { children: React.ReactNode }) {
@@ -70,7 +71,10 @@ export default function DocsPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
+      <main className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <div className="flex gap-10">
+          <DocsToc />
+          <div className="min-w-0 flex-1">
         <p className="text-xs font-medium uppercase tracking-wider text-emerald-400">Documentation</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
           5-minute quickstart
@@ -80,11 +84,11 @@ export default function DocsPage() {
           both free. Or skip the setup and try the live API right now:
         </p>
 
-        <div className="mt-8">
+        <div id="playground" className="mt-8 scroll-mt-24">
           <Playground />
         </div>
 
-        <H2>1. Install the SDK</H2>
+        <H2 id="install">1. Install the SDK</H2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
             <p className="mb-2 font-mono text-xs text-zinc-500">JavaScript / TypeScript</p>
@@ -96,7 +100,7 @@ export default function DocsPage() {
           </div>
         </div>
 
-        <H2>2. Create an API key</H2>
+        <H2 id="api-key">2. Create an API key</H2>
         <P>
           In the <Link href="/dashboard" className="text-emerald-400 hover:text-emerald-300">dashboard</Link>,
           create a project, open <strong className="text-zinc-200">API Keys</strong>, and create a key.
@@ -104,14 +108,14 @@ export default function DocsPage() {
           copy it immediately. Send it as <code className="font-mono text-xs text-zinc-200">Authorization: Bearer &lt;key&gt;</code>.
         </P>
 
-        <H2>3. Define a meter</H2>
+        <H2 id="meter">3. Define a meter</H2>
         <P>
           Open <strong className="text-zinc-200">Meters</strong> and create one — e.g. slug{" "}
           <code className="font-mono text-xs text-emerald-300">tokens</code>, unit “Tokens”, monthly quota 100.
           The slug is what you reference in code.
         </P>
 
-        <H2>4. Wrap your AI call</H2>
+        <H2 id="wrap">4. Wrap your AI call</H2>
         <P>Three lines. Check before you spend, report after:</P>
         <div className="mt-4">
           <Code>{`import { ProtAI } from "@protai/sdk";
@@ -124,7 +128,7 @@ const usage = await openai.chat.completions.create({ /* ... */ });
 await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
         </div>
 
-        <H2>5. Set your guardrails</H2>
+        <H2 id="guardrails">5. Set your guardrails</H2>
         <P>
           Open <strong className="text-zinc-200">Alerts</strong> and add an 80% threshold — you'll be
           emailed before a user burns through quota. If spend ever runs away, the{" "}
@@ -132,7 +136,7 @@ await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
           check instantly.
         </P>
 
-        <H2>Method reference</H2>
+        <H2 id="reference">Method reference</H2>
         <P>Base URL: <code className="font-mono text-xs text-zinc-200">https://protai.co.uk</code> (use <code className="font-mono text-xs text-zinc-200">http://localhost:3000</code> locally). All requests need the <code className="font-mono text-xs text-zinc-200">Authorization: Bearer ptk_…</code> header. Rate limit: 100 requests/minute per key.</P>
         {methods.map((m) => (
           <div key={m.name} className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
@@ -172,7 +176,7 @@ await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
           </div>
         </div>
 
-        <H2>Overage behaviors</H2>
+        <H2 id="overage">Overage behaviors</H2>
         <P>Each meter decides what happens when a user exceeds their monthly quota:</P>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.04] p-5">
@@ -191,7 +195,7 @@ await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
           </div>
         </div>
 
-        <H2>Selling credit packs</H2>
+        <H2 id="packs">Selling credit packs</H2>
         <P>
           Define packs in the dashboard (<strong className="text-zinc-200">Credit Packs</strong>), then sell
           them from your own backend — call the pack checkout endpoint with your ProtAI API key and
@@ -207,7 +211,7 @@ await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
 // → { "url": "https://checkout.stripe.com/…", "session_id": "cs_…" }`}</Code>
         </div>
 
-        <H2>No SDK? Use plain HTTP</H2>
+        <H2 id="http">No SDK? Use plain HTTP</H2>
         <P>Any language can call the API directly:</P>
         <div className="mt-4">
           <Code>{`curl -X POST https://protai.co.uk/api/v1/check \\
@@ -216,7 +220,7 @@ await protai.report(userId, "tokens", usage.usage.total_tokens);`}</Code>
   -d '{"end_user_id":"user_123","meter":"tokens","units":1}'`}</Code>
         </div>
 
-        <H2>Framework quickstarts</H2>
+        <H2 id="frameworks">Framework quickstarts</H2>
         <P>Drop-in patterns for the most common stacks:</P>
 
         <h3 className="mt-6 font-medium text-zinc-100">Next.js API route</h3>
@@ -297,7 +301,7 @@ async def generate(prompt: str, ctx=Depends(lambda: metered(current_user.id))):
     return out`}</Code>
         </div>
 
-        <H2>Webhooks</H2>
+        <H2 id="webhooks">Webhooks</H2>
         <P>
           Push quota events to your own backend instead of polling. Add an endpoint in the dashboard
           under <strong className="text-zinc-200">Webhooks</strong> — ProtAI signs every delivery with
@@ -326,6 +330,8 @@ if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
           >
             Create a free account
           </Link>
+        </div>
+          </div>
         </div>
       </main>
     </>

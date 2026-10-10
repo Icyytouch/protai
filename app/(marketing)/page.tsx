@@ -8,6 +8,10 @@ import { CursorGlow } from "@/components/CursorGlow";
 import { TiltCard } from "@/components/TiltCard";
 import { LiveDashboard } from "@/components/LiveDashboard";
 import { FlowDiagram } from "@/components/FlowDiagram";
+import { TokenFlow } from "@/components/TokenFlow";
+import { KineticHeadline } from "@/components/KineticHeadline";
+import { CinematicSection } from "@/components/CinematicSection";
+import { SpotlightCard } from "@/components/SpotlightCard";
 
 /* ---------------------------------- data ---------------------------------- */
 
@@ -67,24 +71,6 @@ const features = [
     ),
     title: "Built for real traffic",
     body: "Atomic balance updates, idempotent webhooks, per-key rate limits. The correctness work that takes a sprint to build yourself, already done.",
-  },
-];
-
-const steps = [
-  {
-    n: "01",
-    title: "Define a meter",
-    body: "Name your unit (tokens, generations, minutes), set a free monthly quota and an overage rule. Takes about a minute in the dashboard.",
-  },
-  {
-    n: "02",
-    title: "Wrap your AI call",
-    body: "check() before spending, report() after. Three lines with the SDK. Your prompts, models, and pipelines stay untouched.",
-  },
-  {
-    n: "03",
-    title: "Set guardrails",
-    body: "Arm spend alerts and the project kill-switch. Then stop checking your token bill every morning.",
   },
 ];
 
@@ -209,7 +195,9 @@ export default function LandingPage() {
               </Reveal>
               <Reveal delay={100}>
                 <h1 className="mt-6 text-5xl font-semibold leading-[1.02] tracking-tight text-zinc-50 sm:text-6xl lg:text-7xl">
-                  Give every user a balance.
+                  <KineticHeadline text="Give every user" />
+                  <br />
+                  <KineticHeadline text="a balance." />
                   <br />
                   <span className="text-zinc-500">Keep your </span>
                   <RotatingWord
@@ -249,15 +237,25 @@ export default function LandingPage() {
               </Reveal>
             </div>
 
-            {/* Live product */}
+            {/* Live product — WebGL token flow */}
             <Reveal delay={250} y={40}>
-              <TiltCard max={8}>
-                <div className="border-beam">
-                  <LiveDashboard />
+              <div className="relative">
+                <div className="border-beam overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950/60">
+                  <TokenFlow className="h-[380px] w-full sm:h-[440px]" />
                 </div>
-              </TiltCard>
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
+                  <p className="rounded-full border border-zinc-800 bg-zinc-950/80 px-3 py-1 font-mono text-[11px] text-zinc-500 backdrop-blur">
+                    <span className="text-sky-400">●</span> your users
+                    <span className="mx-2 text-zinc-700">→</span>
+                    <span className="text-emerald-400">●</span> ProtAI
+                    <span className="mx-2 text-zinc-700">→</span>
+                    <span className="text-violet-400">●</span> providers
+                  </p>
+                  <p className="hidden font-mono text-[11px] text-zinc-600 sm:block">move your mouse</p>
+                </div>
+              </div>
               <p className="mt-4 text-center text-xs text-zinc-600">
-                Not a mockup. This is the real dashboard, simulated live. Move your mouse over it.
+                Every token your users burn, flowing through ProtAI's guardrails. Live WebGL.
               </p>
             </Reveal>
           </div>
@@ -302,48 +300,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
+      {/* HOW IT WORKS — cinematic scroll */}
       <section id="how" className="border-t border-zinc-800/60">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.4fr]">
-            <div className="lg:sticky lg:top-24">
-              <p className="text-sm font-medium uppercase tracking-widest text-emerald-400">Integration</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
-                Three lines of code.<br />Five minutes.<br />No proxy.
-              </h2>
-              <p className="mt-4 leading-relaxed text-zinc-400">
-                Nothing sits in front of your model traffic. You tell ProtAI what a user
-                spent in tokens or API calls, and it handles balances, quotas, and
-                guardrails. Your prompts, models, and pipelines never change.
-              </p>
-              <Link href="/docs" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-emerald-300 hover:text-emerald-200">
-                Read the integration guide
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
-              </Link>
-            </div>
-            <div>
-              <Reveal>
-                <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
-                  <FlowDiagram />
-                </div>
-              </Reveal>
-              <div className="space-y-4">
-                {steps.map((s, i) => (
-                  <Reveal key={s.n} delay={i * 100}>
-                    <div className="lift-card flex gap-5 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-                      <span className="font-mono text-sm font-semibold text-emerald-400">{s.n}</span>
-                      <div>
-                        <h3 className="font-medium text-zinc-100">{s.title}</h3>
-                        <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{s.body}</p>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
+        <CinematicSection />
+        <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
+          <div className="mx-auto max-w-3xl">
+            <Reveal>
+              <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
+                <FlowDiagram />
               </div>
-              <div className="mt-6">
-                <CodeTabs />
-              </div>
+            </Reveal>
+            <div className="mt-6">
+              <CodeTabs />
             </div>
+            <Reveal>
+              <div className="mt-8 text-center">
+                <Link href="/docs" className="inline-flex items-center gap-2 text-sm font-medium text-emerald-300 hover:text-emerald-200">
+                  Read the integration guide
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+                </Link>
+              </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -441,7 +418,7 @@ export default function LandingPage() {
           <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-3">
             {tiers.map((t, i) => (
               <Reveal key={t.name} delay={i * 100} className="h-full">
-                <div
+                <SpotlightCard
                   className={`lift-card relative flex h-full flex-col rounded-2xl border p-6 ${
                     t.highlight
                       ? "border-emerald-500/50 bg-emerald-500/[0.05]"
@@ -476,7 +453,7 @@ export default function LandingPage() {
                   >
                     {t.cta}
                   </Link>
-                </div>
+                </SpotlightCard>
               </Reveal>
             ))}
           </div>

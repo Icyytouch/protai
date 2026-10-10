@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
+import { CommandBar } from "@/components/dashboard/CommandBar";
 import { signOut } from "@/app/dashboard/_actions";
 
 const nav = [
@@ -13,6 +14,7 @@ const nav = [
   { key: "users", label: "Users", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2m22 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" },
   { key: "ledger", label: "Ledger", icon: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" },
   { key: "alerts", label: "Alerts", icon: "M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-4-5.7V5a2 2 0 1 0-4 0v.3A6 6 0 0 0 6 11v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9" },
+  { key: "copilot", label: "Copilot", icon: "M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Zm7 11 1 2.7 2.7 1-2.7 1-1 2.7-1-2.7-2.7-1 2.7-1 1-2.7Z" },
   { key: "webhooks", label: "Webhooks", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
   { key: "packs", label: "Credit Packs", icon: "M20 7H4a2 2 0 0 1 0-4h14v4m0 0v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5m18 2a2 2 0 0 1 2 2v2a2 2 0 0 1 0 4v2a2 2 0 0 1-2 2" },
   { key: "billing", label: "Billing", icon: "M3 10h18M7 15h2m4 0h2M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2Z" },
@@ -225,6 +227,7 @@ export function Shell({
               ))}
             </nav>
             <div className="ml-auto flex items-center gap-2">
+              <CommandBar />
               <Link
                 href="/blog"
                 target="_blank"
