@@ -2,6 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { createAdminSupabaseClient } from "@/lib/supabase-admin";
 
+// Blog index is dynamic (from the database) — render on demand, not at build time.
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Blog — ProtAI",
   description: "Practical guides on AI cost control, credit metering, and keeping your token bill under control.",
