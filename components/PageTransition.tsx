@@ -17,9 +17,22 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const pendingHref = useRef<string | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const safetyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function later(fn: () => void, ms: number) {
     timers.current.push(setTimeout(fn, ms));
+  }
+
+  function resetToIdle() {
+    if (safetyTimer.current) clearTimeout(safetyTimer.current);
+    setPhase("idle");
+    pendingHref.current = null;
+  }
+
+  function beginReveal() {
+    if (safetyTimer.current) clearTimeout(safetyTimer.current);
+    setPhase("revealing");
+    later(() => resetToIdle(), 520);
   }
 
   // Intercept internal link clicks.
@@ -37,6 +50,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         return;
       }
       if (url.origin !== window.location.origin) return;
+      // Hash-only or identical URL: let the browser handle it natively
+      // (anchor scrolling). Running the curtain here would strand it,
+      // because the pathname never changes.
       if (url.pathname === window.location.pathname && url.search === window.location.search) return;
 
       e.preventDefault();
@@ -46,6 +62,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       // Once covered, perform the navigation underneath.
       later(() => {
         setPhase("holding");
+        // Safety net: if the route never lands (same-path edge cases,
+        // failed navigations), lift the curtain anyway after 3s.
+        safetyTimer.current = setTimeout(() => beginReveal(), 3000);
         router.push(pendingHref.current!);
       }, 480);
     }
@@ -57,8 +76,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   // When the route lands, reveal the new page.
   useEffect(() => {
     if (phase === "holding") {
-      setPhase("revealing");
-      later(() => setPhase("idle"), 520);
+      beginReveal();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
@@ -69,14 +87,20 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       if (phase !== "idle") return;
       setPhase("covering");
       later(() => setPhase("revealing"), 480);
-      later(() => setPhase("idle"), 1000);
+      later(() => resetToIdle(), 1000);
     }
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+      if (safetyTimer.current) clearTimeout(safetyTimer.current);
+    },
+    []
+  );
 
   const active = phase !== "idle";
 
