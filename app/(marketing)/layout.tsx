@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { PageFade } from "@/components/PageFade";
+import { MobileMenu } from "@/components/MobileMenu";
 
 const productLinks = [
   { href: "#how", label: "How it works" },
@@ -37,10 +38,11 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             </Link>
             <Link
               href="/signup"
-              className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400"
+              className="hidden rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 sm:inline-block"
             >
               Start free
             </Link>
+            <MobileMenu />
           </div>
         </div>
       </header>
