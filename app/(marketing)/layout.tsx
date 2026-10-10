@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Logo } from "@/components/Logo";
+import { NavigationProgress } from "@/components/NavigationProgress";
+import { PageFade } from "@/components/PageFade";
 
 const productLinks = [
   { href: "#how", label: "How it works" },
@@ -18,6 +21,9 @@ const resourceLinks = [
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
       <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-zinc-950/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Logo />
@@ -44,15 +50,17 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <PageFade>{children}</PageFade>
+      </main>
 
       <footer className="border-t border-zinc-800/80 bg-zinc-950">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-[1.4fr_1fr_1fr] sm:px-6">
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-500">
-              Drop-in credit metering for AI apps. Per-user balances, spend alerts,
-              and a kill-switch — live in three lines of code.
+              Credit metering for AI apps. Per-user balances, spend alerts,
+              and a kill-switch, live in three lines of code.
             </p>
             <p className="mt-4 font-mono text-xs text-zinc-600">npm i protai · pip install protai</p>
           </div>

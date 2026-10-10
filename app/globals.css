@@ -32,3 +32,80 @@ body {
 ::selection {
   background: rgba(52, 211, 153, 0.25);
 }
+
+/* Route transition progress bar */
+@keyframes nav-progress-slide {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(30%); }
+  100% { transform: translateX(100%); }
+}
+.nav-progress-fill {
+  animation: nav-progress-slide 0.9s ease-in-out infinite;
+  width: 60%;
+}
+
+/* Subtle page fade on route change */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-fade {
+  animation: page-fade-in 0.35s ease-out;
+}
+
+/* Marquee ticker */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-scroll linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Aurora background drift */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.08); }
+  66% { transform: translate(-30px, 25px) scale(0.95); }
+}
+.aurora-orb {
+  animation: aurora-drift 14s ease-in-out infinite;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+/* Card hover lift + glow */
+.lift-card {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s, box-shadow 0.35s;
+}
+.lift-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -20px rgba(52, 211, 153, 0.15);
+}
+
+/* Shimmer on gradient text */
+@keyframes text-shimmer {
+  from { background-position: 0% 50%; }
+  to { background-position: 200% 50%; }
+}
+.text-shimmer {
+  background-size: 200% auto;
+  animation: text-shimmer 5s linear infinite;
+}
+
+/* Pulsing live dot */
+@keyframes live-ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.live-ping::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}

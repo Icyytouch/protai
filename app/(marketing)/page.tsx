@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { CodeTabs } from "./code-tabs";
 import { CostCalculator } from "./cost-calculator";
+import { Reveal } from "@/components/Reveal";
+import { CountUp } from "@/components/CountUp";
+import { Marquee } from "@/components/Marquee";
+import { RotatingWord } from "@/components/RotatingWord";
 
 /* ---------------------------------- data ---------------------------------- */
 
@@ -14,7 +18,7 @@ const features = [
       </svg>
     ),
     title: "Per-user credit balances",
-    body: "Every end user gets their own balance on any meter you define — tokens, generations, minutes, API calls. Monthly free quotas reset automatically; every unit lands in an immutable ledger.",
+    body: "Every user gets their own balance on any meter you define: tokens, generations, minutes, API calls. Monthly free quotas reset on their own, and every unit is written to a ledger you can audit.",
   },
   {
     icon: (
@@ -22,8 +26,8 @@ const features = [
         <path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
       </svg>
     ),
-    title: "Alerts before the invoice",
-    body: "Email the moment a user crosses 80% of quota — or when project-wide spend passes your line. The project kill-switch freezes all usage in one click when things look wrong.",
+    title: "Spend alerts before the invoice",
+    body: "Get an email the moment a user crosses 80% of quota, or when project-wide AI spend passes your limit. The kill-switch freezes all usage in one click when something looks wrong.",
   },
   {
     icon: (
@@ -32,7 +36,7 @@ const features = [
       </svg>
     ),
     title: "Stripe credit packs",
-    body: "Sell top-ups without writing billing code. Create a pack, share the link, and completed purchases land on the buyer's balance automatically. Heavy users fund themselves.",
+    body: "Sell top-ups without writing billing code. Create a pack, share the link, and completed purchases land on the buyer's balance automatically. Your heaviest users fund themselves.",
   },
   {
     icon: (
@@ -41,7 +45,7 @@ const features = [
       </svg>
     ),
     title: "3-line integration",
-    body: "check() before you spend, report() after. JavaScript and Python SDKs, or plain HTTP for anything else. No proxy, no middleware, no changes to your model calls.",
+    body: "Call check() before you spend, report() after. JavaScript and Python SDKs, or plain HTTP for anything else. No proxy, no middleware, no changes to your model calls.",
   },
   {
     icon: (
@@ -49,8 +53,8 @@ const features = [
         <path d="M12 3v18m-6-6 6 6 6-6M5 7h14" />
       </svg>
     ),
-    title: "Overage your way",
-    body: "Per meter, choose hard block (return allowed: false and show an upgrade prompt) or allow-and-alert (never interrupt a paying customer mid-task, just tell yourself).",
+    title: "Overage rules you control",
+    body: "Per meter, pick hard block (returns allowed: false so you can show an upgrade prompt) or allow-and-alert (never interrupt a paying customer mid-task, just notify yourself).",
   },
   {
     icon: (
@@ -58,8 +62,8 @@ const features = [
         <rect x="3" y="11" width="18" height="10" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
     ),
-    title: "Boring in the best way",
-    body: "Atomic balance updates, idempotent webhooks, per-key rate limits. The unglamorous correctness work you'd otherwise spend a sprint on — done.",
+    title: "Built for real traffic",
+    body: "Atomic balance updates, idempotent webhooks, per-key rate limits. The correctness work that takes a sprint to build yourself, already done.",
   },
 ];
 
@@ -67,7 +71,7 @@ const steps = [
   {
     n: "01",
     title: "Define a meter",
-    body: "Name your unit — tokens, generations, minutes — set a free monthly quota and overage behavior. Sixty seconds in the dashboard.",
+    body: "Name your unit (tokens, generations, minutes), set a free monthly quota and an overage rule. Takes about a minute in the dashboard.",
   },
   {
     n: "02",
@@ -77,7 +81,7 @@ const steps = [
   {
     n: "03",
     title: "Set guardrails",
-    body: "Arm spend alerts and the project kill-switch. Then stop thinking about your token bill.",
+    body: "Arm spend alerts and the project kill-switch. Then stop checking your token bill every morning.",
   },
 ];
 
@@ -137,8 +141,16 @@ const tiers = [
 
 const faqs = [
   {
+    q: "How do I control my OpenAI API costs?",
+    a: "Give each user a quota. ProtAI meters every token or API call against a per-user balance, alerts you at 80% usage, and can hard-block or flag overage automatically. Most cost spikes come from a handful of users with no limits, and quotas fix that in an afternoon.",
+  },
+  {
+    q: "What is metered billing for AI apps?",
+    a: "It's usage-based billing where customers pay for what they consume: tokens, generations, minutes. ProtAI provides the metering layer (balances, quotas, ledgers) plus Stripe credit packs so users can buy top-ups. You define the unit, ProtAI tracks it.",
+  },
+  {
     q: "Does ProtAI work with my AI provider?",
-    a: "Yes — it's provider-agnostic and never touches your model calls. You report how many units a user spent (tokens, generations, minutes, whatever you define) and ProtAI handles balances, quotas, and guardrails. OpenAI, Anthropic, Google, open weights, self-hosted — identical integration.",
+    a: "Yes. It's provider-agnostic and never touches your model calls. You report how many units a user spent (tokens, generations, minutes, whatever you define) and ProtAI handles balances, quotas, and guardrails. OpenAI, Anthropic, Google, open weights, self-hosted: identical integration.",
   },
   {
     q: "Do I have to rewrite my AI code?",
@@ -146,15 +158,15 @@ const faqs = [
   },
   {
     q: "What happens when a user runs out of credits?",
-    a: "Your call, per meter. Hard block returns allowed: false so you can show an upgrade prompt. Allow-and-alert keeps usage flowing but emails you immediately — for paying customers you don't want to interrupt mid-task.",
+    a: "Your call, per meter. Hard block returns allowed: false so you can show an upgrade prompt. Allow-and-alert keeps usage flowing but emails you immediately, for paying customers you don't want to interrupt mid-task.",
   },
   {
     q: "How do paid credit packs work?",
-    a: "Create a pack in the dashboard (e.g. 1,000 generations for $9), share the Stripe payment link, and completed purchases top up the buyer's balance automatically via webhook. No billing code on your side.",
+    a: "Create a pack in the dashboard (for example, 1,000 generations for $9), share the Stripe payment link, and completed purchases top up the buyer's balance automatically via webhook. No billing code on your side.",
   },
   {
     q: "Will ProtAI slow down my API?",
-    a: "Check calls are single indexed-row reads — single-digit milliseconds. Report calls are fire-and-forget friendly. Nothing sits in front of your model traffic; there's no proxy to become a bottleneck.",
+    a: "Check calls are single indexed-row reads, single-digit milliseconds. Report calls are fire-and-forget friendly. Nothing sits in front of your model traffic, so there's no proxy to become a bottleneck.",
   },
 ];
 
@@ -168,13 +180,16 @@ function DashboardMock() {
         <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
         <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
         <span className="ml-3 font-mono text-xs text-zinc-500">app.protai.co.uk/dashboard</span>
-        <span className="ml-auto rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">Live</span>
+        <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">
+          <span className="live-ping relative inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
+          Live
+        </span>
       </div>
       <div className="grid grid-cols-3 gap-px bg-zinc-800/60">
         {[
-          { label: "Checks today", value: "48,201", sub: "+12% vs yesterday" },
-          { label: "Tokens reported", value: "1.9M", sub: "across 3 meters" },
-          { label: "Users over 80%", value: "7", sub: "2 alerted by email" },
+          { label: "Checks today", value: <CountUp to={48201} />, sub: "+12% vs yesterday" },
+          { label: "Tokens reported", value: <><CountUp to={1.9} decimals={1} />M</>, sub: "across 3 meters" },
+          { label: "Users over 80%", value: <CountUp to={7} />, sub: "2 alerted by email" },
         ].map((s) => (
           <div key={s.label} className="bg-zinc-950 px-5 py-4">
             <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">{s.label}</p>
@@ -214,14 +229,11 @@ export default function LandingPage() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(720px 340px at 50% -60px, rgba(52,211,153,0.10), transparent 70%), radial-gradient(500px 300px at 85% 20%, rgba(56,189,248,0.05), transparent 70%)",
-          }}
-        />
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="aurora-orb absolute -top-32 left-[8%] h-96 w-96 rounded-full bg-emerald-500/12" />
+          <div className="aurora-orb absolute top-10 right-[5%] h-80 w-80 rounded-full bg-sky-500/10" style={{ animationDelay: "-5s" }} />
+          <div className="aurora-orb absolute top-64 left-[45%] h-72 w-72 rounded-full bg-emerald-400/8" style={{ animationDelay: "-9s" }} />
+        </div>
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-[0.35]"
@@ -235,43 +247,60 @@ export default function LandingPage() {
         />
         <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 py-1.5 pl-1.5 pr-3.5">
-              <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-semibold text-zinc-950">New</span>
-              <span className="text-xs text-zinc-400">Stripe credit packs are live — sell top-ups in minutes</span>
-            </div>
-            <h1 className="mt-7 text-4xl font-semibold leading-[1.08] tracking-tight text-zinc-50 sm:text-6xl">
-              Give every user a balance.<br />
-              <span className="text-zinc-500">Keep your token bill.</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
-              ProtAI is drop-in credit metering for AI apps — per-user balances, spend
-              alerts, and a kill-switch, live in three lines of code. No proxy. Any provider.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/signup"
-                className="w-full rounded-xl bg-emerald-500 px-7 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 sm:w-auto"
-              >
-                Start free
-              </Link>
-              <Link
-                href="/docs"
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-7 py-3 text-sm font-medium text-zinc-100 transition hover:border-zinc-500 sm:w-auto"
-              >
-                Read the docs
-              </Link>
-            </div>
-            <p className="mt-4 font-mono text-xs text-zinc-600">
-              npm i protai&nbsp;&nbsp;·&nbsp;&nbsp;pip install protai&nbsp;&nbsp;·&nbsp;&nbsp;no credit card
-            </p>
+            <Reveal>
+              <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 py-1.5 pl-1.5 pr-3.5">
+                <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-semibold text-zinc-950">New</span>
+                <span className="text-xs text-zinc-400">Stripe credit packs are live — sell top-ups in minutes</span>
+              </div>
+            </Reveal>
+            <Reveal delay={100}>
+              <h1 className="mt-7 text-4xl font-semibold leading-[1.08] tracking-tight text-zinc-50 sm:text-6xl">
+                Give every user a balance.<br />
+                <span className="text-zinc-500">Keep your </span>
+                <RotatingWord
+                  words={["AI bill", "token spend", "margins", "budget"]}
+                  className="text-shimmer bg-gradient-to-r from-emerald-300 via-emerald-400 to-sky-400 bg-clip-text text-transparent"
+                />
+                <span className="text-zinc-500"> under control.</span>
+              </h1>
+            </Reveal>
+            <Reveal delay={200}>
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
+                ProtAI is credit metering for AI apps. Set per-user quotas on tokens,
+                generations, or API calls, get alerted before spend spikes, and stop
+                runaway usage in one click. Works with OpenAI, Anthropic, and any other
+                provider. Live in three lines of code, no proxy.
+              </p>
+            </Reveal>
+            <Reveal delay={300}>
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Link
+                  href="/signup"
+                  className="w-full rounded-xl bg-emerald-500 px-7 py-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-400 sm:w-auto"
+                >
+                  Start free
+                </Link>
+                <Link
+                  href="/docs"
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-7 py-3 text-sm font-medium text-zinc-100 transition hover:border-zinc-500 sm:w-auto"
+                >
+                  Read the docs
+                </Link>
+              </div>
+              <p className="mt-4 font-mono text-xs text-zinc-600">
+                npm i protai&nbsp;&nbsp;·&nbsp;&nbsp;pip install protai&nbsp;&nbsp;·&nbsp;&nbsp;no credit card
+              </p>
+            </Reveal>
           </div>
 
-          <div className="mx-auto mt-14 max-w-4xl">
-            <DashboardMock />
-            <p className="mt-3 text-center text-xs text-zinc-600">
-              The actual dashboard — per-user usage, live. No mockups, no vaporware.
-            </p>
-          </div>
+          <Reveal delay={200} y={40}>
+            <div className="mx-auto mt-14 max-w-4xl">
+              <DashboardMock />
+              <p className="mt-3 text-center text-xs text-zinc-600">
+                Your actual dashboard, per-user usage in real time.
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -281,30 +310,35 @@ export default function LandingPage() {
           <p className="text-center text-xs font-medium uppercase tracking-widest text-zinc-600">
             Provider-agnostic — works with whatever you already use
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-9 gap-y-3">
+          <Marquee speed={28} className="mt-6 [mask-image:linear-gradient(90deg,transparent,black_15%,black_85%,transparent)]">
             {providers.map((p) => (
-              <span key={p} className="text-sm font-medium text-zinc-500">{p}</span>
+              <span key={p} className="mx-8 text-sm font-medium text-zinc-500">{p}</span>
             ))}
-          </div>
+          </Marquee>
         </div>
       </section>
 
       {/* CALCULATOR */}
       <section className="border-t border-zinc-800/60">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium uppercase tracking-widest text-emerald-400">Do the math</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
-              One abusive weekend costs more than a year of ProtAI
-            </h2>
-            <p className="mt-4 leading-relaxed text-zinc-400">
-              Free tiers attract scripts, shared accounts, and prompt-injection loops.
-              Drag the sliders to your numbers — then decide if metering is worth $19.
-            </p>
-          </div>
-          <div className="mt-10">
-            <CostCalculator />
-          </div>
+          <Reveal>
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium uppercase tracking-widest text-emerald-400">AI cost control, in numbers</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+                One abusive weekend can cost more than a year of ProtAI
+              </h2>
+              <p className="mt-4 leading-relaxed text-zinc-400">
+                Free tiers attract scripts, shared accounts, and prompt loops that burn
+                through your OpenAI or Anthropic credits. Drag the sliders to your
+                numbers and see what unmetered AI usage really costs.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={150}>
+            <div className="mt-10">
+              <CostCalculator />
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -315,11 +349,12 @@ export default function LandingPage() {
             <div className="lg:sticky lg:top-24">
               <p className="text-sm font-medium uppercase tracking-widest text-emerald-400">Integration</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
-                Three lines.<br />Five minutes.<br />No proxy.
+                Three lines of code.<br />Five minutes.<br />No proxy.
               </h2>
               <p className="mt-4 leading-relaxed text-zinc-400">
                 Nothing sits in front of your model traffic. You tell ProtAI what a user
-                spent; it handles the rest. Your prompts, models, and pipelines never change.
+                spent in tokens or API calls, and it handles balances, quotas, and
+                guardrails. Your prompts, models, and pipelines never change.
               </p>
               <Link href="/docs" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-emerald-300 hover:text-emerald-200">
                 Read the integration guide
@@ -328,14 +363,16 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="space-y-4">
-                {steps.map((s) => (
-                  <div key={s.n} className="flex gap-5 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-                    <span className="font-mono text-sm font-semibold text-emerald-400">{s.n}</span>
-                    <div>
-                      <h3 className="font-medium text-zinc-100">{s.title}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{s.body}</p>
+                {steps.map((s, i) => (
+                  <Reveal key={s.n} delay={i * 100}>
+                    <div className="lift-card flex gap-5 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+                      <span className="font-mono text-sm font-semibold text-emerald-400">{s.n}</span>
+                      <div>
+                        <h3 className="font-medium text-zinc-100">{s.title}</h3>
+                        <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{s.body}</p>
+                      </div>
                     </div>
-                  </div>
+                  </Reveal>
                 ))}
               </div>
               <div className="mt-6">
@@ -351,17 +388,19 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <p className="text-sm font-medium uppercase tracking-widest text-emerald-400">What you get</p>
           <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
-            Everything between your users and your token bill
+            AI spend management, end to end
           </h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((f) => (
-              <div key={f.title} className="group rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-zinc-700">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-300">
-                  {f.icon}
-                </span>
-                <h3 className="mt-4 font-medium text-zinc-100">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{f.body}</p>
-              </div>
+            {features.map((f, i) => (
+              <Reveal key={f.title} delay={(i % 3) * 100}>
+                <div className="lift-card group h-full rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-zinc-700">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-300">
+                    {f.icon}
+                  </span>
+                  <h3 className="mt-4 font-medium text-zinc-100">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">{f.body}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -372,7 +411,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
           <p className="text-center text-sm font-medium uppercase tracking-widest text-emerald-400">Build vs buy</p>
           <h2 className="mx-auto mt-3 max-w-2xl text-center text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
-            The honest cost of building it yourself
+            What it really costs to build metering yourself
           </h2>
           <div className="mt-10 overflow-hidden rounded-2xl border border-zinc-800">
             <table className="w-full text-left text-sm">
@@ -395,7 +434,7 @@ export default function LandingPage() {
             </table>
           </div>
           <p className="mt-4 text-center text-xs text-zinc-600">
-            Estimates from founders who built it twice — once themselves, once with ProtAI.
+            Estimates from founders who built usage metering twice: once themselves, once with ProtAI.
           </p>
         </div>
       </section>
@@ -408,47 +447,48 @@ export default function LandingPage() {
             Less than one bad weekend
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-zinc-400">
-            Flat monthly. No per-call fees — ProtAI meters your usage, it doesn't run inference.
+            Flat monthly pricing. No per-call fees: ProtAI meters your AI usage, it never runs inference.
           </p>
           <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-3">
-            {tiers.map((t) => (
-              <div
-                key={t.name}
-                className={`relative flex flex-col rounded-2xl border p-6 ${
-                  t.highlight
-                    ? "border-emerald-500/50 bg-emerald-500/[0.05]"
-                    : "border-zinc-800 bg-zinc-900/40"
-                }`}
-              >
-                {t.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold text-zinc-950">
-                    Most popular
-                  </span>
-                )}
-                <h3 className="text-sm font-medium uppercase tracking-wider text-zinc-400">{t.name}</h3>
-                <p className="mt-3">
-                  <span className="text-4xl font-semibold tracking-tight text-zinc-50">{t.price}</span>
-                  <span className="text-sm text-zinc-500"> {t.per}</span>
-                </p>
-                <ul className="mt-6 flex-1 space-y-2.5">
-                  {t.items.map((i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-300">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="mt-0.5 shrink-0 text-emerald-400"><path d="M20 6 9 17l-5-5" /></svg>
-                      {i}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={t.href}
-                  className={`mt-7 rounded-xl px-4 py-2.5 text-center text-sm font-semibold transition ${
+            {tiers.map((t, i) => (
+              <Reveal key={t.name} delay={i * 100} className="h-full">
+                <div
+                  className={`lift-card relative flex h-full flex-col rounded-2xl border p-6 ${
                     t.highlight
-                      ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
-                      : "border border-zinc-700 bg-zinc-900 text-zinc-100 hover:border-zinc-500"
+                      ? "border-emerald-500/50 bg-emerald-500/[0.05]"
+                      : "border-zinc-800 bg-zinc-900/40"
                   }`}
                 >
-                  {t.cta}
-                </Link>
-              </div>
+                  {t.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold text-zinc-950">
+                      Most popular
+                    </span>
+                  )}
+                  <h3 className="text-sm font-medium uppercase tracking-wider text-zinc-400">{t.name}</h3>
+                  <p className="mt-3">
+                    <span className="text-4xl font-semibold tracking-tight text-zinc-50">{t.price}</span>
+                    <span className="text-sm text-zinc-500"> {t.per}</span>
+                  </p>
+                  <ul className="mt-6 flex-1 space-y-2.5">
+                    {t.items.map((i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-300">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="mt-0.5 shrink-0 text-emerald-400"><path d="M20 6 9 17l-5-5" /></svg>
+                        {i}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={t.href}
+                    className={`mt-7 rounded-xl px-4 py-2.5 text-center text-sm font-semibold transition ${
+                      t.highlight
+                        ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+                        : "border border-zinc-700 bg-zinc-900 text-zinc-100 hover:border-zinc-500"
+                    }`}
+                  >
+                    {t.cta}
+                  </Link>
+                </div>
+              </Reveal>
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-zinc-600">Prices in USD. Cancel anytime. No per-call fees, ever.</p>
@@ -463,19 +503,20 @@ export default function LandingPage() {
             Answers, before you ask
           </h2>
           <div className="mt-10 space-y-3">
-            {faqs.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-2xl border border-zinc-800 bg-zinc-900/40 px-6 py-5 open:border-zinc-700"
-              >
-                <summary className="cursor-pointer list-none font-medium text-zinc-100 [&::-webkit-details-marker]:hidden">
-                  <span className="flex items-center justify-between gap-4">
-                    {f.q}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-zinc-500 transition group-open:rotate-180"><path d="m6 9 6 6 6-6" /></svg>
-                  </span>
-                </summary>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-400">{f.a}</p>
-              </details>
+            {faqs.map((f, i) => (
+              <Reveal key={f.q} delay={Math.min(i, 4) * 60}>
+                <details
+                  className="group rounded-2xl border border-zinc-800 bg-zinc-900/40 px-6 py-5 open:border-zinc-700"
+                >
+                  <summary className="cursor-pointer list-none font-medium text-zinc-100 [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center justify-between gap-4">
+                      {f.q}
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-zinc-500 transition group-open:rotate-180"><path d="m6 9 6 6 6-6" /></svg>
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-400">{f.a}</p>
+                </details>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -492,11 +533,11 @@ export default function LandingPage() {
             />
             <div className="relative">
               <h2 className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
-                Your next surprise invoice is optional.
+                Your next surprise AI invoice is optional.
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-                Five minutes to your first meter. Your future self — the one not
-                staring at a $400 token bill on a Monday — says thanks.
+                Five minutes to your first meter. Future you, the one not staring at
+                a $400 token bill on a Monday morning, says thanks.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link

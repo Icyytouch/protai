@@ -14,23 +14,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ProtAI — Stop free-tier users burning your AI budget",
+  title: "ProtAI — AI Cost Control & Credit Metering for AI Apps",
   description:
-    "ProtAI is drop-in credit metering for AI apps — per-user quotas, spend alerts, kill-switch & Stripe top-ups. Stop free-tier users burning your AI budget.",
+    "Control AI API costs with ProtAI: per-user credit balances, spend alerts, and a kill-switch for OpenAI, Anthropic, and any LLM. Metered billing for AI apps in 3 lines of code.",
   metadataBase: new URL("https://protai.co.uk"),
+  keywords: [
+    "AI cost control",
+    "control AI API costs",
+    "LLM cost management",
+    "AI spend management",
+    "metered billing API",
+    "usage-based billing AI",
+    "AI credit system",
+    "token usage tracking",
+    "OpenAI cost control",
+  ],
   openGraph: {
-    title: "ProtAI — Stop free-tier users burning your AI budget",
+    title: "ProtAI — AI Cost Control & Credit Metering for AI Apps",
     description:
-      "Drop-in credit metering for AI apps — per-user quotas, spend alerts, kill-switch & Stripe top-ups.",
+      "Per-user credit balances, spend alerts, and a kill-switch for your AI app. Works with OpenAI, Anthropic, and any provider.",
     url: "https://protai.co.uk",
     siteName: "ProtAI",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "ProtAI — Stop free-tier users burning your AI budget",
+    title: "ProtAI — AI Cost Control & Credit Metering for AI Apps",
     description:
-      "Drop-in credit metering for AI apps — per-user quotas, spend alerts, kill-switch & Stripe top-ups.",
+      "Per-user credit balances, spend alerts, and a kill-switch for your AI app. Live in 3 lines of code.",
   },
 };
 
