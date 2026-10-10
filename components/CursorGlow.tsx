@@ -7,11 +7,6 @@ export function CursorGlow({ className = "" }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const parent = el.parentElement;
-    if (!parent) return;
-
     let raf = 0;
     let tx = -500;
     let ty = -500;
@@ -19,20 +14,30 @@ export function CursorGlow({ className = "" }: { className?: string }) {
     let y = ty;
 
     function onMove(e: MouseEvent) {
-      const r = parent.getBoundingClientRect();
+      const container = ref.current?.parentElement;
+      if (!container) return;
+      const r = container.getBoundingClientRect();
       tx = e.clientX - r.left;
       ty = e.clientY - r.top;
     }
+
     function loop() {
-      x += (tx - x) * 0.08;
-      y += (ty - y) * 0.08;
-      el.style.transform = `translate(${x - 250}px, ${y - 250}px)`;
+      const node = ref.current;
+      if (node) {
+        x += (tx - x) * 0.08;
+        y += (ty - y) * 0.08;
+        node.style.transform = `translate(${x - 250}px, ${y - 250}px)`;
+      }
       raf = requestAnimationFrame(loop);
     }
-    parent.addEventListener("mousemove", onMove);
+
+    const container = ref.current?.parentElement;
+    if (!container) return;
+    container.addEventListener("mousemove", onMove);
     raf = requestAnimationFrame(loop);
+    const el: HTMLElement = container;
     return () => {
-      parent.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(raf);
     };
   }, []);
