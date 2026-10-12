@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PageTransition } from "@/components/PageTransition";
@@ -45,6 +46,9 @@ export const metadata: Metadata = {
     description:
       "Per-user credit balances, spend alerts, and a kill-switch for your AI app. Live in 3 lines of code.",
   },
+  verification: {
+    google: "QBc483OS-c-KKfQAMx12u998yh5JmhTnGFWbovlOeDY",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -57,6 +61,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Suspense fallback={null}>
           <PageTransition>{children}</PageTransition>
         </Suspense>
+        {/* Google Analytics (GA4) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-8SWT3309ST"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-8SWT3309ST');
+          `}
+        </Script>
       </body>
     </html>
   );
