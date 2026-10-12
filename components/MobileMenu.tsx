@@ -13,6 +13,18 @@ const links = [
   { href: "/login", label: "Log in" },
 ];
 
+const companyLinks = [
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+  { href: "/security", label: "Security" },
+];
+
+const legalLinks = [
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/refunds", label: "Refund Policy" },
+];
+
 /** Hamburger menu for the marketing header on small screens. */
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
@@ -40,13 +52,39 @@ export function MobileMenu() {
       {open && (
         <>
           <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <nav className="fixed inset-x-4 top-20 z-50 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/95 shadow-2xl backdrop-blur-xl">
+          <nav className="fixed inset-x-4 top-20 z-50 max-h-[70vh] overflow-y-auto rounded-2xl border border-zinc-800 bg-zinc-950/95 shadow-2xl backdrop-blur-xl">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
                 className="block border-b border-zinc-800/60 px-5 py-3.5 text-sm text-zinc-200 transition last:border-0 hover:bg-zinc-900 hover:text-white"
+              >
+                {l.label}
+              </Link>
+            ))}
+            <p className="border-b border-zinc-800/60 px-5 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+              Company
+            </p>
+            {companyLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="block border-b border-zinc-800/60 px-5 py-3.5 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-white"
+              >
+                {l.label}
+              </Link>
+            ))}
+            <p className="border-b border-zinc-800/60 px-5 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+              Legal
+            </p>
+            {legalLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="block border-b border-zinc-800/60 px-5 py-3.5 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-white"
               >
                 {l.label}
               </Link>

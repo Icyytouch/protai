@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { PageFade } from "@/components/PageFade";
 import { MobileMenu } from "@/components/MobileMenu";
+import { NavDropdown } from "@/components/NavDropdown";
 
 const productLinks = [
   { href: "#how", label: "How it works" },
@@ -29,6 +30,18 @@ const legalLinks = [
   { href: "/refunds", label: "Refund Policy" },
 ];
 
+const companyMenu = [
+  { href: "/about", label: "About", desc: "Why ProtAI exists" },
+  { href: "/contact", label: "Contact", desc: "Talk to a human" },
+  { href: "/security", label: "Security", desc: "How we protect you" },
+];
+
+const legalMenu = [
+  { href: "/terms", label: "Terms of Service", desc: "The rules of the road" },
+  { href: "/privacy", label: "Privacy Policy", desc: "How we handle data" },
+  { href: "/refunds", label: "Refund Policy", desc: "Fair and simple" },
+];
+
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -43,6 +56,8 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             ))}
             <Link href="/docs" className="text-sm text-zinc-400 transition hover:text-zinc-100">Docs</Link>
             <Link href="/blog" className="text-sm text-zinc-400 transition hover:text-zinc-100">Blog</Link>
+            <NavDropdown label="Company" items={companyMenu} />
+            <NavDropdown label="Legal" items={legalMenu} />
           </nav>
           <div className="flex items-center gap-2.5">
             <Link href="/login" className="hidden rounded-xl px-3.5 py-2 text-sm text-zinc-300 transition hover:text-white sm:inline-block">
