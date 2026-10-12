@@ -17,6 +17,18 @@ const resourceLinks = [
   { href: "/signup", label: "Sign up" },
 ];
 
+const companyLinks = [
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+  { href: "/security", label: "Security" },
+];
+
+const legalLinks = [
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/refunds", label: "Refund Policy" },
+];
+
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -52,7 +64,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       </main>
 
       <footer className="border-t border-zinc-800/80 bg-zinc-950">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-[1.4fr_1fr_1fr] sm:px-6">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] sm:px-6">
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-500">
@@ -75,6 +87,26 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Resources</p>
             <nav className="mt-4 flex flex-col gap-2.5">
               {resourceLinks.map((l) => (
+                <Link key={l.href} href={l.href} className="text-sm text-zinc-400 transition hover:text-zinc-100">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Company</p>
+            <nav className="mt-4 flex flex-col gap-2.5">
+              {companyLinks.map((l) => (
+                <Link key={l.href} href={l.href} className="text-sm text-zinc-400 transition hover:text-zinc-100">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Legal</p>
+            <nav className="mt-4 flex flex-col gap-2.5">
+              {legalLinks.map((l) => (
                 <Link key={l.href} href={l.href} className="text-sm text-zinc-400 transition hover:text-zinc-100">
                   {l.label}
                 </Link>
