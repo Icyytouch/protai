@@ -47,4 +47,5 @@ app/api/           internal CRUD + Stripe webhooks
 lib/               supabase, keys, metering, alerts, email, stripe
 supabase/          schema.sql (9 tables + RLS)
 packages/js|python SDKs
+test
 ```
