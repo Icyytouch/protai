@@ -4,6 +4,7 @@ import { createAdminSupabaseClient } from './supabase-admin';
 import { currentPeriod, toNum, type Meter } from './metering';
 import { sendEmail } from './email';
 import { fireWebhooks } from './webhooks';
+import { sendPushToUser } from './push';
 
 /**
  * Threshold-alert detection + email delivery.
@@ -61,9 +62,10 @@ export async function evaluateAlerts(
       // send would silently never run. `after` guarantees it completes
       // without delaying the metering response.
       after(() =>
-        sendAlertEmail(db, projectId, meter, endUserId, usagePct, firedThreshold, period).catch((err) =>
-          console.error('[alerts] email failed:', err),
-        ),
+        Promise.all([
+          sendAlertEmail(db, projectId, meter, endUserId, usagePct, firedThreshold, period),
+          sendThresholdPush(db, projectId, meter, endUserId, usagePct, firedThreshold),
+        ]).catch((err) => console.error('[alerts] notification failed:', err)),
       );
       fireWebhooks(projectId, 'usage.threshold', {
         meter_slug: meter.slug,
@@ -76,6 +78,11 @@ export async function evaluateAlerts(
 
     // Quota exhausted: balance hit zero after this call.
     if (balance <= 0) {
+      after(() =>
+        sendQuotaExhaustedPush(db, projectId, meter, endUserId).catch((err) =>
+          console.error('[alerts] quota push failed:', err),
+        ),
+      );
       fireWebhooks(projectId, 'quota.exhausted', {
         meter_slug: meter.slug,
         end_user_id: endUserId,
@@ -88,6 +95,55 @@ export async function evaluateAlerts(
   }
 }
 
+async function getProjectOwner(
+  db: ReturnType<typeof createAdminSupabaseClient>,
+  projectId: string,
+): Promise<{ ownerId: string | null; projectName: string }> {
+  const { data: project } = await db
+    .from('projects')
+    .select('id, name, owner_id')
+    .eq('id', projectId)
+    .single();
+  return {
+    ownerId: (project as { owner_id?: string } | null)?.owner_id ?? null,
+    projectName: (project as { name?: string } | null)?.name ?? 'your project',
+  };
+}
+
+/** Push a threshold breach to the project owner's phone. */
+async function sendThresholdPush(
+  db: ReturnType<typeof createAdminSupabaseClient>,
+  projectId: string,
+  meter: Meter,
+  endUserId: string,
+  usagePct: number,
+  thresholdPct: number,
+): Promise<void> {
+  const { ownerId, projectName } = await getProjectOwner(db, projectId);
+  if (!ownerId) return;
+  await sendPushToUser(ownerId, {
+    title: `ProtAI: ${Math.round(usagePct)}% of quota used`,
+    body: `${endUserId} hit ${usagePct.toFixed(1)}% on ${meter.slug} (${projectName}) — threshold ${thresholdPct}%.`,
+    url: `/dashboard/${projectId}/ledger`,
+  });
+}
+
+/** Push a quota-exhausted event to the project owner's phone. */
+async function sendQuotaExhaustedPush(
+  db: ReturnType<typeof createAdminSupabaseClient>,
+  projectId: string,
+  meter: Meter,
+  endUserId: string,
+): Promise<void> {
+  const { ownerId, projectName } = await getProjectOwner(db, projectId);
+  if (!ownerId) return;
+  await sendPushToUser(ownerId, {
+    title: `ProtAI: quota exhausted`,
+    body: `${endUserId} ran out of ${meter.slug} credits on ${projectName}. Checks are now denied.`,
+    url: `/dashboard/${projectId}/ledger`,
+  });
+}
+
 async function sendAlertEmail(
   db: ReturnType<typeof createAdminSupabaseClient>,
   projectId: string,
@@ -97,19 +153,13 @@ async function sendAlertEmail(
   thresholdPct: number,
   period: string,
 ): Promise<void> {
-  const { data: project } = await db
-    .from('projects')
-    .select('id, name, owner_id')
-    .eq('id', projectId)
-    .single();
-  const ownerId = (project as { owner_id?: string } | null)?.owner_id;
+  const { ownerId, projectName } = await getProjectOwner(db, projectId);
   if (!ownerId) return;
 
   const { data: userRes } = await db.auth.admin.getUserById(ownerId);
   const email = userRes?.user?.email;
   if (!email) return;
 
-  const projectName = (project as { name?: string } | null)?.name ?? 'your project';
   const subject = `ProtAI alert: ${endUserId} hit ${Math.round(usagePct)}% of quota`;
   const text = [
     `Hi,`,

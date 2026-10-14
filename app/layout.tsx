@@ -5,6 +5,11 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PageTransition } from "@/components/PageTransition";
+import { PwaRegister } from "@/components/pwa-register";
+
+export const viewport = {
+  themeColor: "#09090b",
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +54,11 @@ export const metadata: Metadata = {
   verification: {
     google: "QBc483OS-c-KKfQAMx12u998yh5JmhTnGFWbovlOeDY",
   },
+  appleWebApp: {
+    capable: true,
+    title: "ProtAI",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -58,6 +68,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-zinc-950 text-zinc-100 flex flex-col">
+        <PwaRegister />
         <Suspense fallback={null}>
           <PageTransition>{children}</PageTransition>
         </Suspense>

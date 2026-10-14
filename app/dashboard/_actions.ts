@@ -189,11 +189,20 @@ export async function adjustBalance(
 // ---------- Kill switch ----------
 
 export async function toggleKillSwitch(projectId: string, enabled: boolean) {
-  const { supabase } = await requireProject(projectId);
+  const { supabase, project } = await requireProject(projectId);
   const { error } = await supabase.from("projects").update({ kill_switch: enabled }).eq("id", projectId);
   if (error) throw new Error(error.message);
   const { fireWebhooks } = await import("@/lib/webhooks");
   fireWebhooks(projectId, "kill_switch.toggled", { kill_switch: enabled });
+  const { user } = await requireUser();
+  const { sendPushToUser } = await import("@/lib/push");
+  await sendPushToUser(user.id, {
+    title: enabled ? "ProtAI: kill-switch ON" : "ProtAI: kill-switch OFF",
+    body: enabled
+      ? `Kill-switch enabled on ${project.name} — all usage checks are now denied.`
+      : `Kill-switch disabled on ${project.name} — usage checks work normally again.`,
+    url: `/dashboard/${projectId}`,
+  }).catch(() => {});
   revalidatePath(`/dashboard/${projectId}`);
 }
 

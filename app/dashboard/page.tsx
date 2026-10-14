@@ -3,6 +3,7 @@ import { getUser } from "@/components/supabase/server";
 import { PageHeader, EmptyState, Card, Badge } from "@/components/ui";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { CreateProjectForm } from "./create-project-form";
+import { PhoneAppCard } from "@/components/phone-app-card";
 import type { Project } from "./_types";
 
 export default async function DashboardHome() {
@@ -40,6 +41,7 @@ export default async function DashboardHome() {
           <Card className="mb-8">
             <CreateProjectForm />
           </Card>
+          <PhoneAppCard />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((p) => (
             <Link
