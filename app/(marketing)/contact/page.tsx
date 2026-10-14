@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
 import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "./contact-form";
 
-export const metadata: Metadata = {
-  title: "Contact — ProtAI",
-  description: "Talk to the ProtAI team — billing questions, integration help, feature requests, or partnerships.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/contact", {
+    title: "Contact — ProtAI",
+    description: "Talk to the ProtAI team — billing questions, integration help, feature requests, or partnerships.",
+  });
+}
 
 export default function ContactPage() {
   return (

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
 import { LegalPage, H2, P, UL } from "@/components/LegalPage";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy — ProtAI",
-  description: "How ProtAI collects, uses, and protects your data — and your rights under UK GDPR.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/privacy", {
+    title: "Privacy Policy — ProtAI",
+    description: "How ProtAI collects, uses, and protects your data — and your rights under UK GDPR.",
+  });
+}
 
 export default function PrivacyPage() {
   return (

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getUser } from "@/components/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase-admin";
-import { getSiteRole, canManageRoles, type SiteRole } from "@/lib/roles";
+import { getSiteRole, canManageRoles, canWritePosts, type SiteRole } from "@/lib/roles";
 
 async function requireAdmin() {
   const { user } = await getUser();
@@ -159,4 +159,39 @@ export async function removeFromTeam(userId: string): Promise<{ ok: boolean; err
   if (error) return { ok: false, error: error.message };
   revalidatePath("/dashboard/admin/team");
   return { ok: true };
+}
+
+/** Save per-page SEO metadata (admin SEO panel). */
+export async function saveSeoMeta(
+  pagePath: string,
+  input: { title: string; description: string; keywords: string; noindex: boolean },
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const { user } = await getUser();
+    if (!user) redirect("/login");
+    const role = await getSiteRole(user.id);
+    if (!canWritePosts(role)) redirect("/dashboard");
+    const db = createAdminSupabaseClient();
+    const title = input.title.trim().slice(0, 120);
+    const description = input.description.trim().slice(0, 320);
+    if (!title) return { ok: false, error: "Title is required." };
+    if (!description) return { ok: false, error: "Description is required." };
+    const { error } = await db.from("seo_meta").upsert(
+      {
+        page_path: pagePath,
+        title,
+        description,
+        keywords: input.keywords.trim().slice(0, 300),
+        noindex: input.noindex,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "page_path" },
+    );
+    if (error) return { ok: false, error: error.message };
+    revalidatePath(pagePath);
+    revalidatePath("/dashboard/admin/seo");
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Something went wrong." };
+  }
 }

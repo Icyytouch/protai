@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
 import { Reveal } from "@/components/Reveal";
 import { SpotlightCard } from "@/components/SpotlightCard";
 
-export const metadata: Metadata = {
-  title: "About — ProtAI",
-  description:
-    "ProtAI exists for one reason: AI apps shouldn't go broke on token bills. Learn why we built credit metering for AI apps.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/about", {
+    title: "About — ProtAI",
+    description: "ProtAI exists for one reason: AI apps shouldn't go broke on token bills. Learn why we built credit metering for AI apps.",
+  });
+}
 
 const principles = [
   {

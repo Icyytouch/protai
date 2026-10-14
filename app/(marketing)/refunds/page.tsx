@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
 import { LegalPage, H2, P, UL } from "@/components/LegalPage";
 
-export const metadata: Metadata = {
-  title: "Refund Policy — ProtAI",
-  description: "ProtAI's refund policy for subscriptions and credit packs.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/refunds", {
+    title: "Refund Policy — ProtAI",
+    description: "ProtAI's refund policy for subscriptions and credit packs.",
+  });
+}
 
 export default function RefundsPage() {
   return (

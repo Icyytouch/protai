@@ -311,6 +311,16 @@ async def generate(prompt: str, ctx=Depends(lambda: metered(current_user.id))):
         <div className="mt-4">
           <Code>{`// verify in your endpoint (Node example)
 import { createHmac, timingSafeEqual } from "node:crypto";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/docs", {
+    title: "ProtAI Docs: Meter AI Usage in 5 Minutes (JS, Python, cURL)",
+    description: "Integrate ProtAI in 5 minutes. Check credit balances before you spend, report usage after — with copy-paste quickstarts for Next.js, Express and FastAPI.",
+    keywords: "ProtAI docs, AI metering API",
+  });
+}
+
 
 const sig = req.headers["x-protai-signature"]; // "sha256=…"
 const expected = "sha256=" + createHmac("sha256", process.env.PROTAI_WEBHOOK_SECRET)

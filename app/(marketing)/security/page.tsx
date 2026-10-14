@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
 import { Reveal } from "@/components/Reveal";
 import { LegalPage, H2, P, UL } from "@/components/LegalPage";
 
-export const metadata: Metadata = {
-  title: "Security — ProtAI",
-  description: "How ProtAI protects your data: no-proxy architecture, encrypted everything, hashed API keys, and responsible disclosure.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/security", {
+    title: "Security — ProtAI",
+    description: "How ProtAI protects your data: no-proxy architecture, encrypted everything, hashed API keys, and responsible disclosure.",
+  });
+}
 
 const practices = [
   {

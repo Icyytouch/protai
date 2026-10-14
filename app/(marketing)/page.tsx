@@ -12,6 +12,16 @@ import { TokenFlow } from "@/components/TokenFlow";
 import { KineticHeadline } from "@/components/KineticHeadline";
 import { CinematicSection } from "@/components/CinematicSection";
 import { SpotlightCard } from "@/components/SpotlightCard";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-seo";
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/", {
+    title: "ProtAI: AI Cost Control & Metered Billing for AI Apps",
+    description: "Stop runaway AI spend. ProtAI gives every user a credit balance with quotas, alerts and a kill-switch for OpenAI, Anthropic and any LLM. Live in 3 lines of code.",
+    keywords: "AI cost control, metered billing AI, AI API cost management",
+  });
+}
+
 
 /* ---------------------------------- data ---------------------------------- */
 
