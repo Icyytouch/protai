@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/components/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase-admin";
 import { getSiteRole, canManageRoles, canWritePosts, type SiteRole } from "@/lib/roles";
+import { revalidatePageSeo } from "@/lib/page-seo";
 
 async function requireAdmin() {
   const { user } = await getUser();
@@ -190,6 +191,7 @@ export async function saveSeoMeta(
     if (error) return { ok: false, error: error.message };
     revalidatePath(pagePath);
     revalidatePath("/dashboard/admin/seo");
+    revalidatePageSeo();
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Something went wrong." };
