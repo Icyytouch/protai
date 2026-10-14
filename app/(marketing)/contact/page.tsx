@@ -3,6 +3,8 @@ import { pageMetadata } from "@/lib/page-seo";
 import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "./contact-form";
 
+export const instant = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/contact", {
     title: "Contact — ProtAI",

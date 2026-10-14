@@ -14,6 +14,8 @@ import { CinematicSection } from "@/components/CinematicSection";
 import { SpotlightCard } from "@/components/SpotlightCard";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/page-seo";
+
+export const instant = false;
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/", {
     title: "ProtAI: AI Cost Control & Metered Billing for AI Apps",

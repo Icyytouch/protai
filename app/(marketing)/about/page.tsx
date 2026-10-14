@@ -4,6 +4,8 @@ import { pageMetadata } from "@/lib/page-seo";
 import { Reveal } from "@/components/Reveal";
 import { SpotlightCard } from "@/components/SpotlightCard";
 
+export const instant = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/about", {
     title: "About — ProtAI",

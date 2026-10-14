@@ -313,6 +313,8 @@ async def generate(prompt: str, ctx=Depends(lambda: metered(current_user.id))):
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/page-seo";
+
+export const instant = false;
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/docs", {
     title: "ProtAI Docs: Meter AI Usage in 5 Minutes (JS, Python, cURL)",

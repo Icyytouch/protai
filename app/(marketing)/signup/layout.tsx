@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/page-seo";
 
+export const instant = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/signup", {
     title: "Start Free with ProtAI",

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/page-seo";
 import { LegalPage, H2, P, UL } from "@/components/LegalPage";
 
+export const instant = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/terms", {
     title: "Terms of Service — ProtAI",

@@ -3,6 +3,8 @@ import { pageMetadata } from "@/lib/page-seo";
 import { Reveal } from "@/components/Reveal";
 import { LegalPage, H2, P, UL } from "@/components/LegalPage";
 
+export const instant = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/security", {
     title: "Security — ProtAI",

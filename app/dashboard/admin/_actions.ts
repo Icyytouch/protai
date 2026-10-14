@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/components/supabase/server";
 import { createAdminSupabaseClient } from "@/lib/supabase-admin";
 import { getSiteRole, canManageRoles, canWritePosts, type SiteRole } from "@/lib/roles";
-import { revalidatePageSeo } from "@/lib/page-seo";
+import { revalidatePageSeo, saveSeoRow } from "@/lib/page-seo";
 
 async function requireAdmin() {
   const { user } = await getUser();
@@ -172,23 +172,7 @@ export async function saveSeoMeta(
     if (!user) redirect("/login");
     const role = await getSiteRole(user.id);
     if (!canWritePosts(role)) redirect("/dashboard");
-    const db = createAdminSupabaseClient();
-    const title = input.title.trim().slice(0, 120);
-    const description = input.description.trim().slice(0, 320);
-    if (!title) return { ok: false, error: "Title is required." };
-    if (!description) return { ok: false, error: "Description is required." };
-    const { error } = await db.from("seo_meta").upsert(
-      {
-        page_path: pagePath,
-        title,
-        description,
-        keywords: input.keywords.trim().slice(0, 300),
-        noindex: input.noindex,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "page_path" },
-    );
-    if (error) return { ok: false, error: error.message };
+    await saveSeoRow(pagePath, input);
     revalidatePath(pagePath);
     revalidatePath("/dashboard/admin/seo");
     revalidatePageSeo();
