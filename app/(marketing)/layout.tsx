@@ -135,6 +135,17 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <p className="text-xs text-zinc-600">Prices in USD. Made for indie AI builders.</p>
           </div>
         </div>
+        <p className="pb-5 text-center text-xs text-zinc-600">
+          Designed and developed by{" "}
+          <a
+            href="https://b2bsaas.co.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition hover:text-zinc-100"
+          >
+            B2BSaaS
+          </a>
+        </p>
       </footer>
     </>
   );
